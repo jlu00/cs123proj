@@ -4,7 +4,11 @@ class District:
 	def __init__(self, centroid, tolerance, district_id):
 		self.blocks = []
 		self.id = district_id
-		self.centroid = (centroid[0], centroid[1], centroid[2], centroid[3])
+		self.centroid = [centroid[0], centroid[1], centroid[2], centroid[3]]
+		self.centroid_id = centroid[0]
+		self.centroid_lat = centroid[1]
+		self.centroid_lon = centroid[2]
+		self.centroid_pop = centroid[3]
 		self.population = centroid[3]
 		self.tolerance = tolerance
 

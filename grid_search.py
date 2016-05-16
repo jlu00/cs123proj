@@ -1,7 +1,7 @@
 import district_class as dc
 import numpy as np
 import math
-from grid.py import build_grid 
+from grid import build_grid, hash_map_index
 import heapq 
 
 centroid_l = [[1032,-089.192249,41.326240,39],
@@ -25,28 +25,30 @@ centroid_l = [[1032,-089.192249,41.326240,39],
 [3061,-089.022686,37.722950,0]]
 
 Districts = dc.create_districts(centroid_l, 1)
-Grid, data, dim, lat, lon = build_grid(filename)
+Grid, data, dim, lat, lon = build_grid("IL.csv")
 
 def euclidean_norm(centroid, block):
 	distance = math.sqrt((centroid[0]-block[1])**2+(centroid[1]-block[2])**2)
 	return distance
 
 def neighborhood_to_search(centroid, tol):
+	#print(centroid)
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
-	return [max(i_0-tol, 0), min(i_0+tol, len(Grid[0])], [max(j_0-tol, 0), min(j_0+tol, len(Grid)])
+	return [max(i_0-tol, 0), min(i_0+tol, len(Grid[0]))], [max(j_0-tol, 0), min(j_0+tol, len(Grid))]
 
 def searching_neighborhood(priority_district, tol):
-	y_range, x_range = search_neighborhood(priority_district, tol)
+	y_range, x_range = neighborhood_to_search(priority_district.centroid, tol)
  	dist_list = []
  	for i in x_range:
  		for j in y_range:
  			for block in Grid[i][j]:
 				dist = euclidean_norm(priority_district.centroid, data[i][:])
-				dist_list.append((dist, data[i][0], data[i][1], data[i][2], data[i][3]))
+				dist_list.append((dist, data[i][0], data[i][1], data[i][2], data[i][3], i, j))
 	return dist_list
 
 def searching_all(filename):
 	unassigned_blocks = data.shape[0]
+	print(unassigned_blocks)
 	while unassigned_blocks != 0:
 		tol = 1
 	 	priority_district = dc.return_low_pop(Districts)
@@ -58,6 +60,8 @@ def searching_all(filename):
 
 		heapq.heapify(dist_list)
 		priority_district.add_block(dist_list[0])
+		print(dist_list[0][1:-2])
+		Grid[int(dist_list[0][4])][int(dist_list[0][5])].remove(dist_list[0][1:-2])
 		unassigned_blocks -= 1
 
 searching_all("IL.csv")
