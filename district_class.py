@@ -2,14 +2,14 @@ import heapq
 
 class District:
 	def __init__(self, centroid, tolerance, district_id):
-		self.blocks = [centroid[0]]
+		self.blocks = []
 		self.id = district_id
-		self.centroid = (centroid[1], centroid[2])
+		self.centroid = (centroid[0], centroid[1], centroid[2], centroid[3])
 		self.population = centroid[3]
 		self.tolerance = tolerance
 
 	def add_block(self, block):
-		self.blocks.append(block[1])
+		self.blocks.append(block)
 		self.population += block[2]
 
 	def return_population(self):
