@@ -14,7 +14,7 @@ class District:
 
 	def add_block(self, block):
 		self.blocks.append(block)
-		self.population += block[2]
+		self.population += block[3]
 
 	def return_population(self):
 		return self.population
