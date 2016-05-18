@@ -3,6 +3,8 @@ import numpy as np
 import math
 from grid import build_grid, hash_map_index
 import heapq 
+import matplotlib.pyplot as plt
+import itertools
 
 centroid_l = [[5,+39.810985,-090.925895,6],
 [60505,+41.781883,-087.684522,111],
@@ -41,8 +43,8 @@ def searching_neighborhood(priority_district, tol):
  	for i in x_range:
  		for j in y_range:
  			for block in Grid[i][j]:
-				dist = euclidean_norm(priority_district.centroid, data[i][:])
-				dist_list.append((dist, data[i][0], data[i][1], data[i][2], data[i][3], i, j))
+				dist = euclidean_norm(priority_district.centroid, block)
+				dist_list.append([dist, block[0], block[1], block[2], block[3], i, j])
 	return dist_list
 
 def searching_all(filename):
@@ -58,10 +60,28 @@ def searching_all(filename):
 			dist_list = searching_neighborhood(priority_district, tol)
 
 		heapq.heapify(dist_list)
-		priority_district.add_block(dist_list[0])
 
-		print(dist_list[0][1:-2])
-		Grid[int(dist_list[0][4])][int(dist_list[0][5])].remove(dist_list[0][1:-2])
+		add_block = dist_list[0]
+		priority_district.add_block(add_block[1:-2])
+		
+		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 		unassigned_blocks -= 1
 
+		if unassigned_blocks == (366138 - 100):
+			break
+		print(unassigned_blocks)
+
+def graph(Districts):
+	colors = itertools.cycle(["b", "g", "r", "c", "m", "y", "k"])
+	for district in Districts:
+		print("change district")
+		print("blocks in district", len(district.blocks))
+		print("population in district", district.population)
+		c = next(colors)
+		for block in district.blocks:
+			plt.scatter(block[1], block[2], color=c)
+
+	plt.show()
+
 searching_all("IL.csv")
+graph(Districts)

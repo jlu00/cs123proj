@@ -18,8 +18,8 @@ def create_grid(filename):
 	min_id, min_lat, min_lon, min_pop = data.min(axis=0)
 
 	blocks = data.shape[0]/CB_Per_GB
-	lat_to_lon =  (max_lon - min_lon) / (max_lat - min_lat)
-	x_num = int(math.sqrt(blocks/lat_to_lon))
+	lon_to_lat =  (max_lon - min_lon) / (max_lat - min_lat)
+	x_num = int(math.sqrt(blocks/lon_to_lat))
 	y_num = int(math.ceil(blocks/x_num))
 
 	return [x_num+1, y_num], [min_lat, max_lat], [min_lon, max_lon], data
@@ -42,11 +42,13 @@ def build_grid(filename):
 	Master_Grid = []
 	for r in range(dim[1]):
 		Master_Grid.append([[]]*dim[0])
+
+	#for c in range(dim[0]):
+	#	Master_Grid.append([[]]*dim[1])
 		
 	for item in data:
 		i, j = hash_map_index(dim, lat, lon, item)
-		Master_Grid[i][j].append(item)
+		Master_Grid[i][j].append(item.tolist())
 
+	print("Built grid", len(Master_Grid), len(Master_Grid[0]))
 	return Master_Grid, data, dim, lat, lon
-
-build_grid("IL.csv")
