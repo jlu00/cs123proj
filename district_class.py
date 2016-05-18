@@ -23,7 +23,8 @@ class District:
 		return self.population < other.population
 
 	def __repr__(self):
-		return self.centroid
+		return str(self.centroid)
+		#output must be string
 
 def create_districts(centroid_info, tolerance):
 	districts = []

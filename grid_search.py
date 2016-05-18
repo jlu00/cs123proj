@@ -28,7 +28,7 @@ Districts = dc.create_districts(centroid_l, 1)
 Grid, data, dim, lat, lon = build_grid("IL.csv")
 
 def euclidean_norm(centroid, block):
-	distance = math.sqrt((centroid[0]-block[1])**2+(centroid[1]-block[2])**2)
+	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
 	return distance
 
 def neighborhood_to_search(centroid, tol):
