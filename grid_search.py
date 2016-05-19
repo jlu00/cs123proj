@@ -53,6 +53,7 @@ def searching_all(filename):
 	while unassigned_blocks != 0:
 		tol = 1
 	 	priority_district = dc.return_low_pop(Districts)
+	 	print("Districts", Districts)
 	 	dist_list = searching_neighborhood(priority_district, tol)
 		
 		while dist_list == 0:
@@ -62,7 +63,7 @@ def searching_all(filename):
 		heapq.heapify(dist_list)
 
 		add_block = dist_list[0]
-		priority_district.add_block(add_block[1:-2])
+		priority_district.add_block(add_block[1:-2], Districts)
 		
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 		unassigned_blocks -= 1
@@ -70,6 +71,8 @@ def searching_all(filename):
 		if unassigned_blocks == (366138 - 100):
 			break
 		print(unassigned_blocks)
+		print("population of priority district", priority_district.population)
+		print("which district", priority_district.id)
 
 def graph(Districts):
 	colors = itertools.cycle(["b", "g", "r", "c", "m", "y", "k"])

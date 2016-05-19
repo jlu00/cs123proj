@@ -12,9 +12,10 @@ class District:
 		self.population = centroid[3]
 		self.tolerance = tolerance
 
-	def add_block(self, block):
+	def add_block(self, block, district_list):
 		self.blocks.append(block)
 		self.population += block[3]
+		heapq.heappush(district_list, self)
 
 	def return_population(self):
 		return self.population
@@ -38,7 +39,7 @@ def create_districts(centroid_info, tolerance):
 	return districts 
 
 def return_low_pop(districts):
-	return districts[0]
+	return heapq.heappop(districts)
 
 
 
