@@ -4,6 +4,7 @@ import math
 from grid import build_grid, hash_map_index
 import heapq 
 import matplotlib.pyplot as plt
+#import matplotlib as plt
 import itertools
 
 centroid_l = [[5,+39.810985,-090.925895,6],
@@ -28,6 +29,7 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 
 Districts = dc.create_districts(centroid_l, 1)
 Grid, data, dim, lat, lon = build_grid("IL.csv")
+global_epsilon = 2000
 
 def euclidean_norm(centroid, block):
 	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
@@ -41,17 +43,12 @@ def neighborhood_to_search(centroid, tol):
 
 def searching_neighborhood(priority_district, tol):
 	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol)
- 	dist_list = []
- 	#print("x_range", x_range)
- 	#print("y_range", y_range)
- 	for i in x_range:
+	dist_list = []
+	for i in x_range:
  		for j in y_range:
- 			#print("i j", i, j)
- 			#print(len(Grid))
- 			#print(len(Grid[0]))
  			for block in Grid[i][j]:
-				dist = euclidean_norm(priority_district.centroid, block)
-				dist_list.append([dist, block[0], block[1], block[2], block[3], i, j])
+ 				dist = euclidean_norm(priority_district.centroid, block)
+ 				dist_list.append([dist, block[0], block[1], block[2], block[3], i, j])
 	return dist_list
 
 def searching_all(filename):
@@ -59,9 +56,8 @@ def searching_all(filename):
 	print(unassigned_blocks)
 	while unassigned_blocks != 0:
 		tol = 1
-	 	priority_district = dc.return_low_pop(Districts)
-	 	#print("Districts", Districts)
-	 	dist_list = searching_neighborhood(priority_district, tol)
+		priority_district = dc.return_low_pop(Districts)
+		dist_list = searching_neighborhood(priority_district, tol)
 		
 		while dist_list == 0:
 			tol += 1
@@ -76,20 +72,17 @@ def searching_all(filename):
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 		unassigned_blocks -= 1
 
-		#if unassigned_blocks == (366138 - 500):
-		#	break
+		if unassigned_blocks == (366138 - global_epsilon):
+			break
 		#print(unassigned_blocks)
 		#print("population of priority district", priority_district.population)
 		#print("which district", priority_district.id)
 
 def graph(Districts):
-	plt.plot([39.810985, 41.781883, 41.952518, 41.884529, 40.159843, 38.837947, 41.094140, 
-		42.136809, 39.265350, 42.008476, 41.971581, 38.591100, 38.621083, 42.431654, 
-		40.144836, 38.104917, 41.624047, 41.284644, 40.629956], [-090.925895, -087.684522, 
-		-088.196756, -088.310647, -089.342779, -090.056454, -090.936430, -089.287520, 
-		-088.026622, -089.297788, -089.443183, -088.139386, -089.901350, -089.750755, 
-		-087.594293, -088.133699, -087.923115, -088.114612, -089.275667], 'w')
-	colors = itertools.cycle(["b", "g", "r", "c", "m", "y", "k"])
+	plt.scatter(data[:, 2], data[:, 1], color='k')
+
+	
+	colors = itertools.cycle(["b", "g", "r", "c", "m", "y"])
 	for district in Districts:
 		#print("change district")
 		#print("blocks in district", len(district.blocks))
@@ -98,7 +91,20 @@ def graph(Districts):
 		for block in district.blocks:
 			plt.scatter(block[2], block[1], color=c)
 
+	plt.scatter([-090.925895, -087.684522, 
+		-088.196756, -088.310647, -089.342779, -090.056454, -090.936430, -089.287520, 
+		-088.026622, -089.297788, -089.443183, -088.139386, -089.901350, -089.750755, 
+		-087.594293, -088.133699, -087.923115, -088.114612, -089.275667], [39.810985, 41.781883, 41.952518, 41.884529, 40.159843, 38.837947, 41.094140, 
+		42.136809, 39.265350, 42.008476, 41.971581, 38.591100, 38.621083, 42.431654, 
+		40.144836, 38.104917, 41.624047, 41.284644, 40.629956], color='w', marker='o')
+	plt.savefig(str(global_epsilon)+".png")
 	plt.show()
+
+#data = np.genfromtxt("IL.csv", delimiter=',', skip_header=True)
+#plt.scatter(data[:, 2], data[:, 1])
+#plt.show()
+#plt.savefig("raw.png")
+
 
 searching_all("IL.csv")
 graph(Districts)
