@@ -29,7 +29,7 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 
 Districts = dc.create_districts(centroid_l, 1)
 Grid, data, dim, lat, lon = build_grid("IL.csv")
-global_epsilon = 2000
+global_epsilon = 10000
 
 def euclidean_norm(centroid, block):
 	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
@@ -37,8 +37,18 @@ def euclidean_norm(centroid, block):
 
 def neighborhood_to_search(centroid, tol):
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
-	#print("i_0", i_0)
+	x_size = (lon[1] - lon[0]) / dim[0]
+	y_size = (lat[1] - lat[0]) / dim[1]
+
+	#print("\n actual location", centroid[1], centroid[2])
+	#print("dim", dim)
+	#print("x size", x_size)
+	#print("y size", y_size)
+	#print("lat", lat)
+	#print("lon", lon)
+	#print("centroid i_0, j_0", i_0, j_0)
 	#print("j_0", j_0)
+	#print([max(i_0-tol, 0), min(i_0+tol, len(Grid)-1)], [max(j_0-tol, 0), min(j_0+tol, len(Grid[0])-1)])
 	return [max(i_0-tol, 0), min(i_0+tol, len(Grid)-1)], [max(j_0-tol, 0), min(j_0+tol, len(Grid[0])-1)]
 
 def searching_neighborhood(priority_district, tol):
@@ -96,8 +106,23 @@ def graph(Districts):
 		-088.026622, -089.297788, -089.443183, -088.139386, -089.901350, -089.750755, 
 		-087.594293, -088.133699, -087.923115, -088.114612, -089.275667], [39.810985, 41.781883, 41.952518, 41.884529, 40.159843, 38.837947, 41.094140, 
 		42.136809, 39.265350, 42.008476, 41.971581, 38.591100, 38.621083, 42.431654, 
-		40.144836, 38.104917, 41.624047, 41.284644, 40.629956], color='w', marker='o')
+		40.144836, 38.104917, 41.624047, 41.284644, 40.629956], color='w')#, marker='o')
 	plt.savefig(str(global_epsilon)+".png")
+
+	x_size = (lon[1] - lon[0]) / dim[0]
+	y_size = (lat[1] - lat[0]) / dim[1]
+
+	for r in range(dim[0]):
+		
+		loc = lon[0] - r*y_size
+
+		plt.axvline(x=loc)
+	for c in range(dim[1]):
+		loc = lat[0] + c*x_size
+		
+		plt.axhline(y=loc)
+
+
 	plt.show()
 
 #data = np.genfromtxt("IL.csv", delimiter=',', skip_header=True)
