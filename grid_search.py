@@ -31,11 +31,9 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 '''
 filename= "IL.csv"
 number = 19
-global_epsilon = 500
+global_epsilon = 1000
 
 centroid_l = find_random_centroids(filename, number)
-Districts = dc.create_districts(centroid_l, 1)
-Grid, data, dim, lat, lon = build_grid(filename)
 
 def euclidean_norm(centroid, block):
 	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
@@ -43,8 +41,8 @@ def euclidean_norm(centroid, block):
 
 def neighborhood_to_search(centroid, tol):
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
-	x_size = (lon[1] - lon[0]) / dim[0]
-	y_size = (lat[1] - lat[0]) / dim[1]
+	#x_size = (lon[1] - lon[0]) / dim[0]
+	#y_size = (lat[1] - lat[0]) / dim[1]
 
 	#print("\n actual location", centroid[1], centroid[2])
 	#print("dim", dim)
@@ -57,29 +55,35 @@ def neighborhood_to_search(centroid, tol):
 	#print([max(i_0-tol, 0), min(i_0+tol, len(Grid)-1)], [max(j_0-tol, 0), min(j_0+tol, len(Grid[0])-1)])
 	return [max(i_0-tol, 0), min(i_0+tol, len(Grid)-1)], [max(j_0-tol, 0), min(j_0+tol, len(Grid[0])-1)]
 
-def searching_neighborhood(priority_district, tol):
+def searching_neighborhood(priority_district, tol, Grid):
 	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol)
+	#print("x range", x_range)
+	#print("y range", y_range)
 	dist_list = []
 	for i in x_range:
  		for j in y_range:
  			for block in Grid[i][j]:
+ 				#print("ij", i, j)
  				dist = euclidean_norm(priority_district.centroid, block)
  				dist_list.append([dist, block[0], block[1], block[2], block[3], i, j])
 	return dist_list
 
 def searching_all(filename):
+	Grid, data, dim, lat, lon = build_grid(filename, number)
+	Districts = dc.create_districts(centroid_l, 1)
 	unassigned_blocks = data.shape[0]
-	print(unassigned_blocks)
+	#print(unassigned_blocks)
 	while unassigned_blocks != 0:
 		tol = 1
 		priority_district = dc.return_low_pop(Districts)
-		dist_list = searching_neighborhood(priority_district, tol)
+		dist_list = searching_neighborhood(priority_district, tol, Grid)
 		
-		while dist_list == 0:
+		while len(dist_list) == 0:
 			tol += 1
 			print("changed tolerance.")
 			dist_list = searching_neighborhood(priority_district, tol)
 
+		#print(len(dist_list))
 		heapq.heapify(dist_list)
 
 		add_block = dist_list[0]
@@ -97,7 +101,6 @@ def searching_all(filename):
 def graph(Districts):
 	plt.scatter(data[:, 2], data[:, 1], color='k')
 
-	
 	colors = itertools.cycle(["b", "g", "r", "c", "m", "y"])
 	for district in Districts:
 		#print("change district")
