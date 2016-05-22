@@ -2,11 +2,13 @@ import district_class as dc
 import numpy as np
 import math
 from grid import build_grid, hash_map_index
+from centroids import find_random_centroids
 import heapq 
 import matplotlib.pyplot as plt
 #import matplotlib as plt
 import itertools
 
+'''
 centroid_l = [[5,+39.810985,-090.925895,6],
 [60505,+41.781883,-087.684522,111],
 [120990,+41.952518,-088.196756,43],
@@ -26,10 +28,14 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 [344276,+41.624047,-087.923115,170],
 [351295,+41.284644,-088.114612,114],
 [365115,+40.629956,-089.275667,12]]
+'''
+filename= "IL.csv"
+number = 19
+global_epsilon = 500
 
+centroid_l = find_random_centroids(filename, number)
 Districts = dc.create_districts(centroid_l, 1)
-Grid, data, dim, lat, lon = build_grid("IL.csv")
-global_epsilon = 10000
+Grid, data, dim, lat, lon = build_grid(filename)
 
 def euclidean_norm(centroid, block):
 	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
@@ -101,14 +107,16 @@ def graph(Districts):
 		for block in district.blocks:
 			plt.scatter(block[2], block[1], color=c)
 
-	plt.scatter([-090.925895, -087.684522, 
-		-088.196756, -088.310647, -089.342779, -090.056454, -090.936430, -089.287520, 
-		-088.026622, -089.297788, -089.443183, -088.139386, -089.901350, -089.750755, 
-		-087.594293, -088.133699, -087.923115, -088.114612, -089.275667], [39.810985, 41.781883, 41.952518, 41.884529, 40.159843, 38.837947, 41.094140, 
-		42.136809, 39.265350, 42.008476, 41.971581, 38.591100, 38.621083, 42.431654, 
-		40.144836, 38.104917, 41.624047, 41.284644, 40.629956], color='w')#, marker='o')
+	xx = []
+	yy = []
+	for c in centroid_l:
+		xx.append(c[2])
+		yy.append(c[1])
+
+	plt.scatter(xx, yy, color='w')#, marker='o')
 	plt.savefig(str(global_epsilon)+".png")
 
+	'''
 	x_size = (lon[1] - lon[0]) / dim[0]
 	y_size = (lat[1] - lat[0]) / dim[1]
 
@@ -121,7 +129,7 @@ def graph(Districts):
 		loc = lat[0] + c*x_size
 		
 		plt.axhline(y=loc)
-
+	'''
 
 	plt.show()
 
@@ -131,5 +139,5 @@ def graph(Districts):
 #plt.savefig("raw.png")
 
 
-searching_all("IL.csv")
+searching_all(filename)
 graph(Districts)
