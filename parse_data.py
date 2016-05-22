@@ -21,4 +21,4 @@ def parse_cluster_data(header, pop, results):
 
 	f.close()
 				
-parse_cluster_data('ilgeo.uf1', 'il00001.uf1', 'IL.csv')				 
+parse_cluster_data('data/wygeo.uf1', 'data/wy00001.uf1', 'WY.csv')				 

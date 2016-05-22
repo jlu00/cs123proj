@@ -45,7 +45,7 @@ def hash_map_index(dim, lat, lon, block):
 	return i, j
 	
 def build_grid(filename):
-	dim, lat, lon, data = create_grid(filename, 19)
+	dim, lat, lon, data = create_grid(filename, 1)
 
 	Master_Grid = []
 	for c in range(dim[1]):

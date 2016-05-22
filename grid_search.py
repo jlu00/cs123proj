@@ -29,9 +29,9 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 [351295,+41.284644,-088.114612,114],
 [365115,+40.629956,-089.275667,12]]
 '''
-filename= "IL.csv"
-number = 19
-global_epsilon = 500
+filename= "WY.csv"
+number = 1
+global_epsilon = 'WY10000'
 
 centroid_l = find_random_centroids(filename, number)
 Districts = dc.create_districts(centroid_l, 1)
@@ -43,6 +43,7 @@ def euclidean_norm(centroid, block):
 
 def neighborhood_to_search(centroid, tol):
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
+
 	x_size = (lon[1] - lon[0]) / dim[0]
 	y_size = (lat[1] - lat[0]) / dim[1]
 
@@ -54,9 +55,7 @@ def neighborhood_to_search(centroid, tol):
 	#print("lon", lon)
 	#print("centroid i_0, j_0", i_0, j_0)
 	#print("j_0", j_0)
-	#print([max(i_0-tol, 0), min(i_0+tol, len(Grid)-1)], [max(j_0-tol, 0), min(j_0+tol, len(Grid[0])-1)])
 	return [max(i_0-tol, 0), min(i_0+tol, len(Grid)-1)], [max(j_0-tol, 0), min(j_0+tol, len(Grid[0])-1)]
-
 def searching_neighborhood(priority_district, tol):
 	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol)
 	dist_list = []
@@ -69,16 +68,17 @@ def searching_neighborhood(priority_district, tol):
 
 def searching_all(filename):
 	unassigned_blocks = data.shape[0]
-	print(unassigned_blocks)
+	print(unassigned_blocks, "blocks")
 	while unassigned_blocks != 0:
 		tol = 1
 		priority_district = dc.return_low_pop(Districts)
 		dist_list = searching_neighborhood(priority_district, tol)
 		
-		while dist_list == 0:
+		while len(dist_list) == 0:
 			tol += 1
 			print("changed tolerance.")
 			dist_list = searching_neighborhood(priority_district, tol)
+			print(len(dist_list), "distlist length")
 
 		heapq.heapify(dist_list)
 
@@ -88,9 +88,9 @@ def searching_all(filename):
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 		unassigned_blocks -= 1
 
-		if unassigned_blocks == (366138 - global_epsilon):
+		if unassigned_blocks == 57000:
 			break
-		#print(unassigned_blocks)
+		print(unassigned_blocks)
 		#print("population of priority district", priority_district.population)
 		#print("which district", priority_district.id)
 
