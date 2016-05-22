@@ -43,8 +43,13 @@ def hash_map_index(dim, lat, lon, block):
 	#print("j", j)
 	return i, j
 	
+<<<<<<< HEAD
 def build_grid(filename, number):
 	dim, lat, lon, data = create_grid(filename, number)
+=======
+def build_grid(filename):
+	dim, lat, lon, data = create_grid(filename, 1)
+>>>>>>> e37c6e4a9d2ccbfbee1cf33b45a4f713ae5a1eec
 
 	Master_Grid = []
 	for c in range(dim[1]):
