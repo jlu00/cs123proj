@@ -29,15 +29,10 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 [351295,+41.284644,-088.114612,114],
 [365115,+40.629956,-089.275667,12]]
 '''
-<<<<<<< HEAD
-filename= "IL.csv"
-number = 19
-global_epsilon = 1000
-=======
-filename= "WY.csv"
+
+filename= "NV.csv"
 number = 1
-global_epsilon = 'WY10000'
->>>>>>> e37c6e4a9d2ccbfbee1cf33b45a4f713ae5a1eec
+global_epsilon = 1000
 
 centroid_l = find_random_centroids(filename, number)
 
@@ -45,16 +40,10 @@ def euclidean_norm(centroid, block):
 	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
 	return distance
 
-def neighborhood_to_search(centroid, tol):
+def neighborhood_to_search(centroid, tol, dim, lat, lon):
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
-<<<<<<< HEAD
 	#x_size = (lon[1] - lon[0]) / dim[0]
 	#y_size = (lat[1] - lat[0]) / dim[1]
-=======
-
-	x_size = (lon[1] - lon[0]) / dim[0]
-	y_size = (lat[1] - lat[0]) / dim[1]
->>>>>>> e37c6e4a9d2ccbfbee1cf33b45a4f713ae5a1eec
 
 	#print("\n actual location", centroid[1], centroid[2])
 	#print("dim", dim)
@@ -64,14 +53,11 @@ def neighborhood_to_search(centroid, tol):
 	#print("lon", lon)
 	#print("centroid i_0, j_0", i_0, j_0)
 	#print("j_0", j_0)
-	return [max(i_0-tol, 0), min(i_0+tol, len(Grid)-1)], [max(j_0-tol, 0), min(j_0+tol, len(Grid[0])-1)]
-<<<<<<< HEAD
+	return [max(i_0-tol, 0), min(i_0+tol, dim[1]-1)], [max(j_0-tol, 0), min(j_0+tol, dim[0]-1)]
 
-def searching_neighborhood(priority_district, tol, Grid):
-=======
-def searching_neighborhood(priority_district, tol):
->>>>>>> e37c6e4a9d2ccbfbee1cf33b45a4f713ae5a1eec
-	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol)
+
+def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
+	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol, dim, lat, lon)
 	#print("x range", x_range)
 	#print("y range", y_range)
 	dist_list = []
@@ -85,22 +71,21 @@ def searching_neighborhood(priority_district, tol):
 
 def searching_all(filename):
 	Grid, data, dim, lat, lon = build_grid(filename, number)
+	print(len(Grid[0]), dim[0])
+	print(len(Grid), dim[1])
 	Districts = dc.create_districts(centroid_l, 1)
 	unassigned_blocks = data.shape[0]
-<<<<<<< HEAD
 	#print(unassigned_blocks)
-=======
-	print(unassigned_blocks, "blocks")
->>>>>>> e37c6e4a9d2ccbfbee1cf33b45a4f713ae5a1eec
+
 	while unassigned_blocks != 0:
 		tol = 1
 		priority_district = dc.return_low_pop(Districts)
-		dist_list = searching_neighborhood(priority_district, tol, Grid)
+		dist_list = searching_neighborhood(priority_district, tol, Grid, dim, lat, lon)
 		
 		while len(dist_list) == 0:
 			tol += 1
 			print("changed tolerance.")
-			dist_list = searching_neighborhood(priority_district, tol)
+			dist_list = searching_neighborhood(priority_district, tol, dim, lat, lon)
 			print(len(dist_list), "distlist length")
 
 		#print(len(dist_list))
@@ -112,13 +97,14 @@ def searching_all(filename):
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 		unassigned_blocks -= 1
 
-		if unassigned_blocks == 57000:
+		if unassigned_blocks == (data.shape[0] - global_epsilon):
 			break
-		print(unassigned_blocks)
+		#print(unassigned_blocks)
 		#print("population of priority district", priority_district.population)
 		#print("which district", priority_district.id)
+	graph(Districts, data)
 
-def graph(Districts):
+def graph(Districts, data):
 	plt.scatter(data[:, 2], data[:, 1], color='k')
 
 	colors = itertools.cycle(["b", "g", "r", "c", "m", "y"])
@@ -163,4 +149,4 @@ def graph(Districts):
 
 
 searching_all(filename)
-graph(Districts)
+#graph(Districts)
