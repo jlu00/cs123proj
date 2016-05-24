@@ -30,11 +30,20 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 [365115,+40.629956,-089.275667,12]]
 '''
 
+<<<<<<< HEAD
 filename= "NV.csv"
 number = 1
 global_epsilon = 1000
+=======
+filename= "NE.csv"
+number = 3
+global_epsilon = 2500
+
+>>>>>>> 813a14e7f70c2dee738cf16c6ddee32a00dc6997
 
 centroid_l = find_random_centroids(filename, number)
+Grid, data, dim, lat, lon = build_grid(filename, number)
+Districts = dc.create_districts(centroid_l, 1)
 
 def euclidean_norm(centroid, block):
 	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
@@ -42,6 +51,7 @@ def euclidean_norm(centroid, block):
 
 def neighborhood_to_search(centroid, tol, dim, lat, lon):
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
+<<<<<<< HEAD
 	#x_size = (lon[1] - lon[0]) / dim[0]
 	#y_size = (lat[1] - lat[0]) / dim[1]
 
@@ -58,6 +68,21 @@ def neighborhood_to_search(centroid, tol, dim, lat, lon):
 
 def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
 	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol, dim, lat, lon)
+=======
+
+	#x_size = (lon[1] - lon[0]) / dim[0]
+	#y_size = (lat[1] - lat[0]) / dim[1]
+
+
+	x_size = (lon[1] - lon[0]) / dim[0]
+	y_size = (lat[1] - lat[0]) / dim[1]
+
+	return [max(i_0-tol, 0), min(i_0+tol, len(Grid)-1)], [max(j_0-tol, 0), min(j_0+tol, len(Grid[0])-1)]
+
+
+def searching_neighborhood(priority_district, tol, Grid):
+	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol)
+>>>>>>> 813a14e7f70c2dee738cf16c6ddee32a00dc6997
 	#print("x range", x_range)
 	#print("y range", y_range)
 	dist_list = []
@@ -71,21 +96,31 @@ def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
 
 def searching_all(filename):
 	Grid, data, dim, lat, lon = build_grid(filename, number)
+<<<<<<< HEAD
 	print(len(Grid[0]), dim[0])
 	print(len(Grid), dim[1])
 	Districts = dc.create_districts(centroid_l, 1)
 	unassigned_blocks = data.shape[0]
 	#print(unassigned_blocks)
 
+=======
+	#Districts = dc.create_districts(centroid_l, 1)
+	#print(Districts, "districts")
+	unassigned_blocks = data.shape[0]
+>>>>>>> 813a14e7f70c2dee738cf16c6ddee32a00dc6997
 	while unassigned_blocks != 0:
-		tol = 1
+		tol = 0
 		priority_district = dc.return_low_pop(Districts)
 		dist_list = searching_neighborhood(priority_district, tol, Grid, dim, lat, lon)
 		
 		while len(dist_list) == 0:
 			tol += 1
 			print("changed tolerance.")
+<<<<<<< HEAD
 			dist_list = searching_neighborhood(priority_district, tol, dim, lat, lon)
+=======
+			dist_list = searching_neighborhood(priority_district, tol, Grid)
+>>>>>>> 813a14e7f70c2dee738cf16c6ddee32a00dc6997
 			print(len(dist_list), "distlist length")
 
 		#print(len(dist_list))
@@ -97,7 +132,11 @@ def searching_all(filename):
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 		unassigned_blocks -= 1
 
+<<<<<<< HEAD
 		if unassigned_blocks == (data.shape[0] - global_epsilon):
+=======
+		if unassigned_blocks == data.shape[0]-global_epsilon:
+>>>>>>> 813a14e7f70c2dee738cf16c6ddee32a00dc6997
 			break
 		#print(unassigned_blocks)
 		#print("population of priority district", priority_district.population)
