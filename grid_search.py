@@ -32,8 +32,8 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 #centroid_l = [[3904.0, 36.283938, -114.194808, 0.0]]
 
 filename= "CA.csv"
-number = 55
-global_epsilon = 10000
+number = 2
+global_epsilon = 0
 
 centroid_l = find_random_centroids(filename, number)
 #Grid, data, dim, lat, lon = build_grid(filename, number)
@@ -82,8 +82,10 @@ def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
  			for block in Grid[i][j]:
  				
  				count += 1
+
  				dist = euclidean_norm(priority_district.centroid, block)
  				dist_list.append([dist, block[0], block[1], block[2], block[3], i, j])
+
 	#print("counted blocks", count)
 	return dist_list
 
