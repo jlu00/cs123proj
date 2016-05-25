@@ -1,7 +1,7 @@
 import district_class as dc
 import numpy as np
 import math
-from grid import build_grid, hash_map_index, grid_is_valid
+from grid import build_grid, hash_map_index, grid_is_valid, find_random_centroids
 #from centroids import find_random_centroids
 import heapq 
 import matplotlib.pyplot as plt
