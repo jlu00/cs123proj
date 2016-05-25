@@ -8,7 +8,9 @@ import matplotlib.pyplot as plt
 import itertools
 import sys
 
+#centroid_l = [[3904.0, 36.283938, -114.194808, 0.0]]
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 '''
 centroid_l = [[5,+39.810985,-090.925895,6],
@@ -34,6 +36,8 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 
 #centroid_l = [[3904.0, 36.283938, -114.194808, 0.0]]
 
+=======
+>>>>>>> f2b68a8f0a89d52b8165ccb97c300f2fb9afebf7
 filename= "CA.csv"
 number = 2
 global_epsilon = 0
@@ -41,8 +45,11 @@ global_epsilon = 0
 centroid_l = find_random_centroids(filename, number)
 #Grid, data, dim, lat, lon = build_grid(filename, number)
 Districts = dc.create_districts(centroid_l, 1)
+<<<<<<< HEAD
 =======
 >>>>>>> 288a055bb3c14fd3f375bb981f17482da10c7dc0
+=======
+>>>>>>> f2b68a8f0a89d52b8165ccb97c300f2fb9afebf7
 
 def euclidean_norm(centroid, block):
 	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
