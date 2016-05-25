@@ -1,17 +1,16 @@
 from mrjob.job import MRjob
 from mrjob.step import MRStep
 import mrjob
-from grid_search import searching_all
-from grid_search import graph
+import grid_search.py
 import matplotlib.pyplot as plt
+import os
+
 
 
 class MRStates(MRJob):
 	OUTPUT_PROTOCOL = mrjob.protocol.JSONValueProtocol
 	def mapper(self, _, line):
-		state_filename = line.split(",\n")
-		grid_search(state_filename)
-		graph(state_filename)
+		grid_search(line[0], line[1])
 
 		yield None, None
 
