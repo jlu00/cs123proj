@@ -2,7 +2,7 @@ import district_class as dc
 import numpy as np
 import math
 from grid import build_grid, hash_map_index, grid_is_valid
-from centroids import find_random_centroids
+#from centroids import find_random_centroids
 import heapq 
 import matplotlib.pyplot as plt
 import itertools
@@ -98,12 +98,6 @@ def searching_all(filename, number):
 		#print("i j:", add_block[5], add_block[6])
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 		unassigned_blocks -= 1
-<<<<<<< HEAD
-		if (unassigned_blocks%100)==0:
-=======
-		if (unassigned_blocks%1000)==0:
->>>>>>> e8f25854e36201e78456cf28593694d3c28e8549
-			print(unassigned_blocks)
 		#if not grid_is_valid(dim, lat, lon, Grid):
 		#	return
 
