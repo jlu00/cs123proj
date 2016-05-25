@@ -21,17 +21,17 @@ def create_grid(filename, number):
 	min_lat -= eps
 	min_lon -= eps
 
-	print("Create Grid")
-	print(max_lat, max_lon)
-	print(min_lat, min_lon)
+	#print("Create Grid")
+	#print(max_lat, max_lon)
+	#print(min_lat, min_lon)
 
 	blocks = data.shape[0]/CB_Per_GB
-	print(blocks)
+	#print(blocks)
 	lon_to_lat =  (max_lon - min_lon) / (max_lat - min_lat) #cannot be wrong
-	print(lon_to_lat)
+	#print(lon_to_lat)
 	y_num = math.sqrt(blocks/lon_to_lat)
 	x_num = blocks/y_num
-	print(x_num, y_num)
+	#print(x_num, y_num)
 
 	return [int(math.ceil(x_num)), int(math.ceil(y_num))], [min_lat, max_lat], [min_lon, max_lon], data
 
@@ -91,8 +91,8 @@ def build_grid(filename, number):
 		#Master_Grid.append([[]]*dim[0])
 		Master_Grid.append(row)
 
-	print(Master_Grid)
-	print("data shape", data.shape[0])
+	#print(Master_Grid)
+	#print("data shape", data.shape[0])
 	count = 0
 	for item in data:
 		count += 1
@@ -105,6 +105,6 @@ def build_grid(filename, number):
 	if not grid_is_valid(dim, lat, lon, Master_Grid):
 		return
 
-	print("counted blocks", count)
+	#print("counted blocks", count)
 	print("Built grid", len(Master_Grid), len(Master_Grid[0]))
 	return Master_Grid, data, dim, lat, lon

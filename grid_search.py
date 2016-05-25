@@ -31,9 +31,9 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 
 #centroid_l = [[3904.0, 36.283938, -114.194808, 0.0]]
 
-filename= "NV.csv"
-number = 1
-global_epsilon = 100
+filename= "CA.csv"
+number = 55
+global_epsilon = 10000
 
 centroid_l = find_random_centroids(filename, number)
 #Grid, data, dim, lat, lon = build_grid(filename, number)
@@ -49,8 +49,8 @@ def debug(i_0, j_0, Grid, centroid):
 		dist = euclidean_norm(centroid, block)
 		dist_list.append([dist, block[0], block[1], block[2], block[3], i_0, j_0])
 	heapq.heapify(dist_list)
-	print("local heaped items", dist_list[:5])
-	print('\n')
+	#print("local heaped items", dist_list[:5])
+	#print('\n')
 
 #def neighborhood_to_search(centroid, tol, dim, lat, lon):
 def neighborhood_to_search(centroid, tol, dim, lat, lon, Grid):
@@ -60,31 +60,31 @@ def neighborhood_to_search(centroid, tol, dim, lat, lon, Grid):
 	#y_size = (lat[1] - lat[0]) / dim[1]
 
 	#print("\n actual location", centroid[1], centroid[2])
-	print("dim", dim)
+	#print("dim", dim)
 	#print("x size", x_size)
 	#print("y size", y_size)
 	#print("lat", lat)
 	#print("lon", lon)
-	print("centroid i_0, j_0", i_0, j_0)
-	debug(i_0, j_0, Grid, centroid)
+	#print("centroid i_0, j_0", i_0, j_0)
+	#debug(i_0, j_0, Grid, centroid)
 	return [max(i_0-tol, 0), min(i_0+tol, dim[1]-1)], [max(j_0-tol, 0), min(j_0+tol, dim[0]-1)]
 
 def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
 	#x_range, y_range = neighborhood_to_search(priority_district.centroid, tol, dim, lat, lon)
 	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol, dim, lat, lon, Grid)
-	print("x range", x_range)
-	print("y range", y_range)
+	#print("x range", x_range)
+	#print("y range", y_range)
 	count = 0
 	dist_list = []
 	for i in range(x_range[0], x_range[1]+1):
  		for j in range(y_range[0], y_range[1]+1):
- 			print("ij", i, j)
+ 			#print("ij", i, j)
  			for block in Grid[i][j]:
  				
  				count += 1
  				dist = euclidean_norm(priority_district.centroid, block)
  				dist_list.append([dist, block[0], block[1], block[2], block[3], i, j])
-	print("counted blocks", count)
+	#print("counted blocks", count)
 	return dist_list
 
 def searching_all(filename):
@@ -99,29 +99,29 @@ def searching_all(filename):
 	while unassigned_blocks != 0:
 		tol = 1
 		priority_district = dc.return_low_pop(Districts)
-		print("\nASSIGNING BLOCK")
-		if not grid_is_valid(dim, lat, lon, Grid):
-			return
+		#print("\nASSIGNING BLOCK")
+		#if not grid_is_valid(dim, lat, lon, Grid):
+		#	return
 		dist_list = searching_neighborhood(priority_district, tol, Grid, dim, lat, lon)
-		print(len(dist_list))
+		#print(len(dist_list))
 
 		while len(dist_list) == 0:
 			tol += 1
 			print("changed tolerance.")
 
 			dist_list = searching_neighborhood(priority_district, tol, Grid, dim, lat, lon)
-			print(len(dist_list), "distlist length")
-		if not grid_is_valid(dim, lat, lon, Grid):
-			return
+			#print(len(dist_list), "distlist length")
+		#if not grid_is_valid(dim, lat, lon, Grid):
+		#	return
 
-		print("length of dist list", len(dist_list))
-		print("unheaped items", dist_list[:5])
-		print('\n')
+		#print("length of dist list", len(dist_list))
+		#print("unheaped items", dist_list[:5])
+		#print('\n')
 		heapq.heapify(dist_list)
-		print("heaped items", dist_list[:5])
-		print('\n')
-		print(centroid_l)
-		print(data.shape[0])
+		#print("heaped items", dist_list[:5])
+		#print('\n')
+		#print(centroid_l)
+		#print(data.shape[0])
 
 		add_block = dist_list[0]
 		priority_district.add_block(add_block[1:-2], Districts)
@@ -129,8 +129,8 @@ def searching_all(filename):
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 		unassigned_blocks -= 1
 
-		if not grid_is_valid(dim, lat, lon, Grid):
-			return
+		#if not grid_is_valid(dim, lat, lon, Grid):
+		#	return
 
 		if unassigned_blocks == (data.shape[0] - global_epsilon):
 			break
