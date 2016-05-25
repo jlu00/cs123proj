@@ -69,7 +69,6 @@ def find_random_centroids(filename, number):
             if hm_tuple not in hash_list:
                 hash_list.append(hm_tuple)
                 centroid_list.append(random_block)
-                print(hm_tuple)
                 start += 1
         centroids = []
         for c in centroid_list:
@@ -77,7 +76,6 @@ def find_random_centroids(filename, number):
             for d in c:
                 formatted_c.append(float(d))
             centroids.append(formatted_c)
-    print(centroids)
     return centroids
 
 	
