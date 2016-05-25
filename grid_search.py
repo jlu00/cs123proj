@@ -6,38 +6,9 @@ from centroids import find_random_centroids
 import heapq 
 import matplotlib.pyplot as plt
 import itertools
+import sys
 
-'''
-centroid_l = [[5,+39.810985,-090.925895,6],
-[60505,+41.781883,-087.684522,111],
-[120990,+41.952518,-088.196756,43],
-[175250,+41.884529,-088.310647,30],
-[213505,+40.159843,-089.342779,81],
-[47455,+38.837947,-090.056454,0],
-[258010,+41.094140,-090.936430,15],
-[268540,+42.136809,-089.287520,25],
-[100310,+39.265350,-088.026622,15],
-[270390,+42.008476,-089.297788,2],
-[270450,+41.971581,-089.443183,0],
-[286895,+38.591100,-088.139386,6],
-[298995,+38.621083,-089.901350,32],
-[317725,+42.431654,-089.750755,8],
-[324765,+40.144836,-087.594293,102],
-[336465,+38.104917,-088.133699,8],
-[344276,+41.624047,-087.923115,170],
-[351295,+41.284644,-088.114612,114],
-[365115,+40.629956,-089.275667,12]]
-'''
 
-#centroid_l = [[3904.0, 36.283938, -114.194808, 0.0]]
-
-filename= "CA.csv"
-number = 55
-global_epsilon = 10000
-
-centroid_l = find_random_centroids(filename, number)
-#Grid, data, dim, lat, lon = build_grid(filename, number)
-Districts = dc.create_districts(centroid_l, 1)
 
 def euclidean_norm(centroid, block):
 	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
@@ -87,10 +58,10 @@ def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
 	#print("counted blocks", count)
 	return dist_list
 
-def searching_all(filename):
+def searching_all(filename, number):
 	Grid, data, dim, lat, lon = build_grid(filename, number)
 	
-	Districts = dc.create_districts(centroid_l, 1)
+	Districts = dc.create_districts(CENTROID_L)
 	unassigned_blocks = data.shape[0]
 	#print(unassigned_blocks)
 
@@ -132,7 +103,7 @@ def searching_all(filename):
 		#if not grid_is_valid(dim, lat, lon, Grid):
 		#	return
 
-		if unassigned_blocks == (data.shape[0] - global_epsilon):
+		if unassigned_blocks == (data.shape[0] - EPSILON):
 			break
 		#print(unassigned_blocks)
 		#print("population of priority district", priority_district.population)
@@ -153,28 +124,12 @@ def graph(Districts, data):
 
 	xx = []
 	yy = []
-	for c in centroid_l:
+	for c in CENTROID_L:
 		xx.append(c[2])
 		yy.append(c[1])
 
 	plt.scatter(xx, yy, color='w')#, marker='o')
-	plt.savefig(str(global_epsilon)+".png")
-
-	'''
-	x_size = (lon[1] - lon[0]) / dim[0]
-	y_size = (lat[1] - lat[0]) / dim[1]
-
-	for r in range(dim[0]):
-		
-		loc = lon[0] - r*y_size
-
-		plt.axvline(x=loc)
-	for c in range(dim[1]):
-		loc = lat[0] + c*x_size
-		
-		plt.axhline(y=loc)
-	'''
-
+	plt.savefig(str(EPSILON)+".png")
 	plt.show()
 
 #data = np.genfromtxt("IL.csv", delimiter=',', skip_header=True)
@@ -183,6 +138,10 @@ def graph(Districts, data):
 #plt.savefig("raw.png")
 
 
-
-searching_all(filename)
-#graph(Districts)
+if __name__ == "__main__":
+	
+	CENTROID_L = find_random_centroids(sys.argv[1], int(sys.argv[2]))
+	DISTRICTS = dc.create_districts(CENTROID_L)
+	EPSILON = int(sys.argv[3])
+	searching_all(sys.argv[1], int(sys.argv[2]))
+	
