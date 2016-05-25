@@ -50,9 +50,7 @@ def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
  		for j in range(y_range[0], y_range[1]+1):
  			#print("ij", i, j)
  			for block in Grid[i][j]:
- 				
  				count += 1
-
  				dist = euclidean_norm(priority_district.centroid, block)
  				dist_list.append([dist, block[0], block[1], block[2], block[3], i, j])
 
