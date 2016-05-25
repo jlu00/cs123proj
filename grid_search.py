@@ -101,9 +101,9 @@ def searching_all(filename, number):
 		#if not grid_is_valid(dim, lat, lon, Grid):
 		#	return
 
-		if unassigned_blocks == (data.shape[0] - EPSILON):
-			break
-		#print(unassigned_blocks)
+		#if unassigned_blocks == (data.shape[0] - EPSILON):
+		#	break
+		print(unassigned_blocks)
 		#print("population of priority district", priority_district.population)
 		#print("which district", priority_district.id)
 	graph(Districts, data)
