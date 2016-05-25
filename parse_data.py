@@ -1,3 +1,4 @@
+import sys
 
 def parse_cluster_data(header, pop, results):
 	with open(header, 'r') as header_file:
@@ -20,5 +21,6 @@ def parse_cluster_data(header, pop, results):
 
 
 	f.close()
-				
-parse_cluster_data('data/negeo.uf1', 'data/ne00001.uf1', 'NE.csv')				 
+
+if __name__ == "__main__":
+	parse_cluster_data('data/' + sys.argv[1] + 'geo.uf1', 'data/' + sys.argv[1] + '00001.uf1',  sys.argv[1].upper() + '.csv')				 
