@@ -139,7 +139,10 @@ def graph(Districts, data):
 
 
 if __name__ == "__main__":
-	
+	if sys.argv[2] <= 1:
+		print("Not enough number of districts.")
+		sys.exit(1)
+		
 	CENTROID_L = find_random_centroids(sys.argv[1], int(sys.argv[2]))
 	DISTRICTS = dc.create_districts(CENTROID_L)
 	EPSILON = int(sys.argv[3])
