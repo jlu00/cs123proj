@@ -98,7 +98,7 @@ def searching_all(filename, number):
 		#print("i j:", add_block[5], add_block[6])
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 		unassigned_blocks -= 1
-		if (unassigned_blocks%100)==0:
+		if (unassigned_blocks%1000)==0:
 			print(unassigned_blocks)
 		#if not grid_is_valid(dim, lat, lon, Grid):
 		#	return
