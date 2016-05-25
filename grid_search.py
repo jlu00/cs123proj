@@ -112,6 +112,7 @@ def graph(Districts, data):
 	plt.scatter(data[:, 2], data[:, 1], color='k')
 
 	colors = itertools.cycle(["b", "g", "r", "c", "m", "y"])
+	
 	for district in Districts:
 		#print("change district")
 		#print("blocks in district", len(district.blocks))
@@ -119,7 +120,7 @@ def graph(Districts, data):
 		c = next(colors)
 		for block in district.blocks:
 			plt.scatter(block[2], block[1], color=c)
-
+	
 	xx = []
 	yy = []
 	for c in CENTROID_L:
@@ -132,7 +133,6 @@ def graph(Districts, data):
 
 #data = np.genfromtxt("IL.csv", delimiter=',', skip_header=True)
 #plt.scatter(data[:, 2], data[:, 1])
-#plt.show()
 #plt.savefig("raw.png")
 
 
@@ -145,4 +145,4 @@ if __name__ == "__main__":
 	DISTRICTS = dc.create_districts(CENTROID_L)
 	EPSILON = int(sys.argv[3])
 	searching_all(sys.argv[1], int(sys.argv[2]))
-	
+
