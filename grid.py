@@ -1,6 +1,7 @@
+import csv
+import random
 import math
 import numpy as np
-from centroids import find_random_centroids
 
 def create_grid(filename, number):
 	'''
@@ -42,8 +43,8 @@ def hash_map_index(dim, lat, lon, block):
 	#print("x_size", x_size)
 	#print("y_size", y_size)
 
-	_j = int((block[2] - lon[0]) / x_size) 
-	_i = int((block[1] - lat[0]) / y_size) 
+	_j = int((float(block[2]) - lon[0]) / x_size) 
+	_i = int((float(block[1]) - lat[0]) / y_size) 
 	#print("_i", _i)
 	#print("_j", _j)
 	
@@ -52,6 +53,33 @@ def hash_map_index(dim, lat, lon, block):
 	#print("i", i)
 	#print("j", j)
 	return i, j
+
+def find_random_centroids(filename, number):
+    random.seed(0)
+    hash_list = []
+    centroid_list = []
+    dim, lat, lon, data = create_grid(filename, number)
+    with open(filename, 'r') as f:
+        reader = csv.reader(f)
+        reader = list(reader)
+        start = 0
+        while start < number:
+            random_block = random.sample(reader, 1)[0]
+            hm_tuple = hash_map_index(dim, lat, lon, random_block)
+            if hm_tuple not in hash_list:
+                hash_list.append(hm_tuple)
+                centroid_list.append(random_block)
+                print(hm_tuple)
+                start += 1
+        centroids = []
+        for c in centroid_list:
+            formatted_c = []
+            for d in c:
+                formatted_c.append(float(d))
+            centroids.append(formatted_c)
+    print(centroids)
+    return centroids
+
 	
 def grid_is_valid(dim, lat, lon, Grid):
 	count = 0
