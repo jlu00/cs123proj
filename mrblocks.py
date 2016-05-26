@@ -1,4 +1,4 @@
-from mrjob.job import MRjob
+from mrjob.job import MRJob
 import numpy as np
 import heapq
 import random
@@ -6,19 +6,19 @@ import csv
 import math
 import matplotlib.pyplot as plt
 import os
+import itertools
 
 
 class MRStates(MRJob):
 	def mapper(self, _, line):
 		stateline = line.split(", ")
-		redistrict("statecsv." + stateline[0], state[1])
-
+		redistrict("/home/student/cs123proj/statecsv/"+ str(stateline[0]), int(stateline[1]))
 
 def redistrict(filename, number):
-	CENTROID_L = find_random_centroids(filename, number)
-	DISTRICTS = dc.create_districts(CENTROID_L)
-	STATENAME = filename[0:2]
-	searching_all(filename, number)
+    centroid_l = find_random_centroids(filename, number)
+    districts = create_districts(centroid_l)
+    statename = filename[9:11]
+    searching_all(filename, number, centroid_l, statename)
 
 def euclidean_norm(centroid, block):
 	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
@@ -39,33 +39,27 @@ def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
  				dist_list.append([dist, block[0], block[1], block[2], block[3], i, j])
 	return dist_list
 
-def searching_all(filename, number):
-	Grid, data, dim, lat, lon = build_grid(filename, number)
-	
-	Districts = dc.create_districts(CENTROID_L)
-	unassigned_blocks = data.shape[0]
-
-	colors_dict = get_colors(Districts)
-	
-	while unassigned_blocks != 0:
-		tol = 1
-		priority_district = dc.return_low_pop(Districts)
-		dist_list = searching_neighborhood(priority_district, tol, Grid, dim, lat, lon)
-
-		while len(dist_list) == 0:
-			tol += 1
-			print("changed tolerance.")
-
-			dist_list = searching_neighborhood(priority_district, tol, Grid, dim, lat, lon)
-		#heapq.heapify(dist_list)
-
-		add_block = min(dist_list)
-		priority_district.add_block(add_block[1:-2], Districts)
-		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
-		plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
-		unassigned_blocks -= 1
-		print(unassigned_blocks)
-	graph(Districts, data)
+def searching_all(filename, number, centroid_l, statename):
+    Grid, data, dim, lat, lon = build_grid(filename, number)
+    Districts = create_districts(centroid_l)
+    unassigned_blocks = data.shape[0]
+    colors_dict = get_colors(Districts)
+    while unassigned_blocks != 0:
+        tol = 1
+        priority_district = return_low_pop(Districts)
+        dist_list = searching_neighborhood(priority_district, tol, Grid, dim, lat, lon)
+        while len(dist_list) == 0:
+            tol += 1
+            dist_list = searching_neighborhood(priority_district, tol, Grid, dim, lat, lon)
+        add_block = min(dist_list)
+        priority_district.add_block(add_block[1:-2], Districts)
+        Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
+        plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
+        if unassigned_blocks == (data.shape[0] - 100):
+            graph(Districts, data, centroid_l, statename)
+            break
+        unassigned_blocks -= 1
+    graph(Districts, data, centroid_l, statename)
 
 def get_colors(Districts):
 	colors_dict = {}
@@ -75,43 +69,33 @@ def get_colors(Districts):
 		colors_dict[district.id] = c
 	return colors_dict
 
-def graph(districts, data):
+def graph(districts, data, centroid_l, statename):
 	#plt.scatter(data[:, 2], data[:, 1], color='k')
 	xx = []
 	yy = []
-	for c in CENTROID_L:
+	for c in centroid_l:
 		xx.append(c[2])
 		yy.append(c[1])
 
 	plt.scatter(xx, yy, color='w')
-	plt.savefig(STATENAME+".png")
+	plt.savefig(statename+".png")
 	plt.show()
 
 def create_grid(filename, number):
-	'''
-	[ (id, lat, long, pop),
-	   (id, lat, long, pop)]
-
-	[ [id, lat, long, pop],
-	  [id, lat, long, pop] ]
-	'''
-	data = np.genfromtxt(filename, delimiter=',', skip_header=True)
-	CB_Per_GB = (data.shape[0]/number)*(2/9)
-	
-	eps = 0.00000001
-	max_id, max_lat, max_lon, pop = data.max(axis=0)
-	min_id, min_lat, min_lon, min_pop = data.min(axis=0)
-	max_lon += eps
-	max_lat += eps
-	min_lat -= eps
-	min_lon -= eps
-
-	blocks = data.shape[0]/CB_Per_GB
-	lon_to_lat =  (max_lon - min_lon) / (max_lat - min_lat)
-	y_num = math.sqrt(blocks/lon_to_lat)
-	x_num = blocks/y_num
-
-	return [int(math.ceil(x_num)), int(math.ceil(y_num))], [min_lat, max_lat], [min_lon, max_lon], data
+    data = np.genfromtxt(filename, delimiter=',', skip_header=True)
+    CB_Per_GB = (data.shape[0]/number)*(2/9)
+    eps = 0.00000001
+    max_id, max_lat, max_lon, pop = data.max(axis=0)
+    min_id, min_lat, min_lon, min_pop = data.min(axis=0)
+    max_lon += eps
+    max_lat += eps
+    min_lat -= eps
+    min_lon -= eps
+    blocks = data.shape[0]/CB_Per_GB
+    lon_to_lat =  (max_lon - min_lon) / (max_lat - min_lat)
+    y_num = math.sqrt(blocks/lon_to_lat)
+    x_num = blocks/y_num
+    return [int(math.ceil(x_num)), int(math.ceil(y_num))], [min_lat, max_lat], [min_lon, max_lon], data
 
 def hash_map_index(dim, lat, lon, block):
 	x_size = (lon[1] - lon[0]) / dim[0]
@@ -123,6 +107,8 @@ def hash_map_index(dim, lat, lon, block):
 	return i, j
 
 def find_random_centroids(filename, number):
+    print(os.getcwd())
+    print(filename, "file")
     random.seed(0)
     hash_list = []
     centroid_list = []
@@ -161,22 +147,61 @@ def grid_is_valid(dim, lat, lon, Grid):
 	return True
 
 def build_grid(filename, number):
-	dim, lat, lon, data = create_grid(filename, number)
+    dim, lat, lon, data = create_grid(filename, number)
+    Master_Grid = []
+    for r in range(dim[1]):
+        row = []
+        for c in range(dim[0]):
+            row.append([])
+            Master_Grid.append(row)
+            count = 0
+    for item in data:
+        count += 1
+        i, j = hash_map_index(dim, lat, lon, item)
+        Master_Grid[i][j].append(item.tolist())
+    #if not grid_is_valid(dim, lat, lon, Master_Grid):
+    #    return
+    return Master_Grid, data, dim, lat, lon
 
-	Master_Grid = []
-	for r in range(dim[1]):
-		row = []
-		for c in range(dim[0]):
-			row.append([])
-		Master_Grid.append(row)
-	count = 0
-	for item in data:
-		count += 1
-		i, j = hash_map_index(dim, lat, lon, item)
-		Master_Grid[i][j].append(item.tolist())
-	if not grid_is_valid(dim, lat, lon, Master_Grid):
-		return
-	return Master_Grid, data, dim, lat, lon
+class District:
+    def __init__(self, centroid, district_id):
+        self.blocks = []
+        self.id = district_id
+        self.centroid = [centroid[0], centroid[1], centroid[2], centroid[3]]
+        self.centroid_id = centroid[0]
+        self.centroid_lat = centroid[1]
+        self.centroid_lon = centroid[2]
+        self.centroid_pop = centroid[3]
+        self.population = centroid[3]
+
+    def add_block(self, block, district_list):
+        self.blocks.append(block)
+        self.population += block[3]
+        heapq.heappush(district_list, self)
+
+    def return_population(self):
+        return self.population
+
+    def __lt__(self, other):
+        return self.population < other.population
+
+    def __repr__(self):
+        return str(self.centroid)
+        #output must be string
+
+def create_districts(centroid_info):
+    districts = []
+    i = 0
+    for c in centroid_info:
+        new_district = District(c, i)
+        districts.append(new_district)
+        i+=1        
+
+    heapq.heapify(districts)
+    return districts 
+
+def return_low_pop(districts):
+    return heapq.heappop(districts)
 
 if __name__ == '__main__':
 	MRStates.run()
