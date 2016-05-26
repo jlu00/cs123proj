@@ -19,24 +19,11 @@ def debug(i_0, j_0, Grid, centroid):
 		dist = euclidean_norm(centroid, block)
 		dist_list.append([dist, block[0], block[1], block[2], block[3], i_0, j_0])
 	heapq.heapify(dist_list)
-	#print("local heaped items", dist_list[:5])
-	#print('\n')
+	
 
 #def neighborhood_to_search(centroid, tol, dim, lat, lon):
 def neighborhood_to_search(centroid, tol, dim, lat, lon, Grid):
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
-
-	#x_size = (lon[1] - lon[0]) / dim[0]
-	#y_size = (lat[1] - lat[0]) / dim[1]
-
-	#print("\n actual location", centroid[1], centroid[2])
-	#print("dim", dim)
-	#print("x size", x_size)
-	#print("y size", y_size)
-	#print("lat", lat)
-	#print("lon", lon)
-	#print("centroid i_0, j_0", i_0, j_0)
-	#debug(i_0, j_0, Grid, centroid)
 	return [max(i_0-tol, 0), min(i_0+tol, dim[1]-1)], [max(j_0-tol, 0), min(j_0+tol, dim[0]-1)]
 
 def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
