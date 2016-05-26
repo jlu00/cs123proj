@@ -57,19 +57,20 @@ def searching_all(filename, number, centroid_l, statename):
         priority_district.add_block(add_block[1:-2], Districts)
         Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
         plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
-        if unassigned_blocks == (data.shape[0] - 200):
+        if unassigned_blocks == (data.shape[0] - 500):
             graph(Districts, data, centroid_l, statename)
             break
         unassigned_blocks -= 1
     #graph(Districts, data, centroid_l, statename)
 
 def get_colors(Districts):
-	colors_dict = {}
-	colors = itertools.cycle(["b", "g", "r", "c", "m", "y"])
-	for district in Districts:
-		c = next(colors)
-		colors_dict[district.id] = c
-	return colors_dict
+    colors_dict = {}
+    colormap = plt.cm.Accent
+    colors = itertools.cycle([colormap(i) for i in np.linspace(0, 0.9, len(Districts))])
+    for district in Districts:
+        c = next(colors)
+        colors_dict[district.id] = c
+    return colors_dict
 
 def graph(districts, data, centroid_l, statename):
 	#plt.scatter(data[:, 2], data[:, 1], color='k')
