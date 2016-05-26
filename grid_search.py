@@ -65,6 +65,8 @@ def searching_all(filename, number):
 	#print(unassigned_blocks)
 
 	#print(Districts, "districts")
+
+	colors_dict = get_colors(Districts)
 	
 	while unassigned_blocks != 0:
 		tol = 1
@@ -96,7 +98,10 @@ def searching_all(filename, number):
 		add_block = dist_list[0]
 		priority_district.add_block(add_block[1:-2], Districts)
 		#print("i j:", add_block[5], add_block[6])
+
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
+		#print("blocks", add_block)
+		plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
 		unassigned_blocks -= 1
 		#if not grid_is_valid(dim, lat, lon, Grid):
 		#	return
@@ -108,9 +113,18 @@ def searching_all(filename, number):
 		#print("which district", priority_district.id)
 	graph(Districts, data)
 
-def graph(Districts, data):
-	plt.scatter(data[:, 2], data[:, 1], color='k')
+def get_colors(Districts):
+	colors_dict = {}
+	colors = itertools.cycle(["b", "g", "r", "c", "m", "y"])
+	for district in Districts:
+		c = next(colors)
+		colors_dict[district.id] = c
+	return colors_dict
 
+def graph(Districts, data):
+	#plt.scatter(data[:, 2], data[:, 1], color='k')
+
+	'''
 	colors = itertools.cycle(["b", "g", "r", "c", "m", "y"])
 	
 	for district in Districts:
@@ -120,7 +134,7 @@ def graph(Districts, data):
 		c = next(colors)
 		for block in district.blocks:
 			plt.scatter(block[2], block[1], color=c)
-	
+	'''
 	xx = []
 	yy = []
 	for c in CENTROID_L:

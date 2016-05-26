@@ -12,12 +12,5 @@ class MRStates(MRJob):
 	def mapper(self, _, line):
 		grid_search(line[0], line[1])
 
-		yield None, None
-
-	def steps(self):
-		return [
-			MRStep(mapper=self.mapper)
-		]
-
 if __name__ = '__main__':
 	MRStates.run()
