@@ -10,14 +10,16 @@ import itertools
 
 
 class MRStates(MRJob):
-	def mapper(self, _, line):
-		stateline = line.split(", ")
-		redistrict("/home/student/cs123proj/statecsv/"+ str(stateline[0]), int(stateline[1]))
+    def mapper(self, _, line):
+        stateline = line.split(", ")
+        redistrict("/home/student/cs123proj/statecsv/"+ str(stateline[0]), int(stateline[1]))
 
 def redistrict(filename, number):
     centroid_l = find_random_centroids(filename, number)
     districts = create_districts(centroid_l)
-    statename = filename[9:11]
+    statename = (filename[-6:])[0:2]
+    print(statename)
+
     searching_all(filename, number, centroid_l, statename)
 
 def euclidean_norm(centroid, block):
@@ -55,11 +57,11 @@ def searching_all(filename, number, centroid_l, statename):
         priority_district.add_block(add_block[1:-2], Districts)
         Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
         plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
-        if unassigned_blocks == (data.shape[0] - 100):
+        if unassigned_blocks == (data.shape[0] - 200):
             graph(Districts, data, centroid_l, statename)
             break
         unassigned_blocks -= 1
-    graph(Districts, data, centroid_l, statename)
+    #graph(Districts, data, centroid_l, statename)
 
 def get_colors(Districts):
 	colors_dict = {}
@@ -71,15 +73,15 @@ def get_colors(Districts):
 
 def graph(districts, data, centroid_l, statename):
 	#plt.scatter(data[:, 2], data[:, 1], color='k')
-	xx = []
-	yy = []
-	for c in centroid_l:
-		xx.append(c[2])
-		yy.append(c[1])
+    xx = []
+    yy = []
+    for c in centroid_l:
+        xx.append(c[2])
+        yy.append(c[1])
 
-	plt.scatter(xx, yy, color='w')
-	plt.savefig(statename+".png")
-	plt.show()
+    plt.scatter(xx, yy, color='w')
+    plt.savefig("/home/student/cs123proj/districtpics/" + statename+".png")
+    plt.clf()
 
 def create_grid(filename, number):
     data = np.genfromtxt(filename, delimiter=',', skip_header=True)
@@ -107,8 +109,6 @@ def hash_map_index(dim, lat, lon, block):
 	return i, j
 
 def find_random_centroids(filename, number):
-    print(os.getcwd())
-    print(filename, "file")
     random.seed(0)
     hash_list = []
     centroid_list = []

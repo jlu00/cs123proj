@@ -136,7 +136,6 @@ def graph(Districts, data):
 #plt.scatter(data[:, 2], data[:, 1])
 #plt.savefig("raw.png")
 
-
 if __name__ == "__main__":
 	if int(sys.argv[2]) <= 1:
 		print("Not enough number of districts.")
@@ -146,4 +145,3 @@ if __name__ == "__main__":
 	DISTRICTS = dc.create_districts(CENTROID_L)
 	EPSILON = int(sys.argv[3])
 	searching_all(sys.argv[1], int(sys.argv[2]))
-

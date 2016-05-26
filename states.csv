@@ -4,7 +4,6 @@ AZ.csv, 6
 CA.csv, 52
 CO.csv, 6
 CT.csv, 6
-DE.csv, 1
 FL.csv, 23
 GA.csv, 11
 ID.csv, 2
@@ -21,7 +20,6 @@ MI.csv, 16
 MN.csv, 8
 MS.csv, 5
 MO.csv, 9
-MT.csv, 1
 NE.csv, 3
 NV.csv, 2
 NH.csv, 2
@@ -29,14 +27,12 @@ NJ.csv, 13
 NM.csv, 3
 NY.csv, 31
 NC.csv, 12
-ND.csv, 1
 OH.csv, 19
 OK.csv, 6
 OR.csv, 5
 PA.csv, 21
 RI.csv, 2
 SC.csv, 6
-SD.csv, 1
 TN.csv, 9
 TX.csv, 30
 UT.csv, 3
@@ -45,4 +41,3 @@ VA.csv, 11
 WA.csv, 9
 WV.csv, 3
 WI.csv, 9
-WY.csv, 1
