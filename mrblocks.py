@@ -1,21 +1,23 @@
 from mrjob.job import MRjob
-from mrjob.step import MRStep
-import mrjob
+import numpy as np
+import heapq
+import random
+import csv
+import math
 import matplotlib.pyplot as plt
 import os
 
 
-""
-
 class MRStates(MRJob):
-	OUTPUT_PROTOCOL = mrjob.protocol.JSONValueProtocol
 	def mapper(self, _, line):
-		redistrict(line[0], line[1])
+		stateline = line.split(", ")
+		redistrict("statecsv." + stateline[0], state[1])
 
 
 def redistrict(filename, number):
 	CENTROID_L = find_random_centroids(filename, number)
 	DISTRICTS = dc.create_districts(CENTROID_L)
+	STATENAME = filename[0:2]
 	searching_all(filename, number)
 
 def euclidean_norm(centroid, block):
@@ -55,9 +57,9 @@ def searching_all(filename, number):
 			print("changed tolerance.")
 
 			dist_list = searching_neighborhood(priority_district, tol, Grid, dim, lat, lon)
-		heapq.heapify(dist_list)
+		#heapq.heapify(dist_list)
 
-		add_block = dist_list[0]
+		add_block = min(dist_list)
 		priority_district.add_block(add_block[1:-2], Districts)
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 		plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
@@ -82,7 +84,7 @@ def graph(districts, data):
 		yy.append(c[1])
 
 	plt.scatter(xx, yy, color='w')
-	plt.savefig(str(EPSILON)+".png")
+	plt.savefig(STATENAME+".png")
 	plt.show()
 
 def create_grid(filename, number):
@@ -176,5 +178,5 @@ def build_grid(filename, number):
 		return
 	return Master_Grid, data, dim, lat, lon
 
-if __name__ = '__main__':
+if __name__ == '__main__':
 	MRStates.run()
