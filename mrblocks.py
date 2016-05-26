@@ -5,10 +5,12 @@ import matplotlib.pyplot as plt
 import os
 
 
+""
 
 class MRStates(MRJob):
 	OUTPUT_PROTOCOL = mrjob.protocol.JSONValueProtocol
 	def mapper(self, _, line):
+<<<<<<< HEAD
 		redistrict(line[0], line[1])
 
 
@@ -174,6 +176,12 @@ def build_grid(filename, number):
 	if not grid_is_valid(dim, lat, lon, Master_Grid):
 		return
 	return Master_Grid, data, dim, lat, lon
+=======
+		grid_search(line[0], line[1])
+        fields = line.split(",")
+        fields[0] fields[1]
+        yield
+>>>>>>> 5159059fb6fd650929fa819596e3f22345c0f56e
 
 if __name__ = '__main__':
 	MRStates.run()
