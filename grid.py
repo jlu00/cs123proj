@@ -128,8 +128,8 @@ def build_grid(filename, number):
 		Master_Grid[i][j].append(item.tolist())
 		#print(Master_Grid[i][j])
 		#print(Master_Grid)
-	if not grid_is_valid(dim, lat, lon, Master_Grid):
-		return
+	#if not grid_is_valid(dim, lat, lon, Master_Grid):
+	#	return
 
 	#print("counted blocks", count)
 	print("Built grid", len(Master_Grid), len(Master_Grid[0]))
