@@ -10,7 +10,7 @@ from multiprocessing import Pool, Process, Queue
 
 EPSILON = 500
 
-data = np.genfromtxt('IL.csv', delimiter=',', skip_header=True)
+data = np.genfromtxt('statecsv/IL.csv', delimiter=',', skip_header=True)
 #data = np.genfromtxt('ILsubset.csv', delimiter=',', skip_header=True)
 
 centroid_l = [[5,+39.810985,-090.925895,6],
@@ -50,7 +50,7 @@ def euclidean_norm(block, centroid):
     t1 = (centroid[1] - block[1])
     t2 = (centroid[2] - block[2])
     distance = math.sqrt(t1*t1 + t2*t2)
-    return [distance, block[0], block[1], block[2], block[3]]
+    return distance
     #block[0] = num; block[1] = lat; block[2] = lon; block[3] = pop
 
 def find_nearest_block(data, centroid, q):
@@ -111,9 +111,7 @@ def assign_blocks(centroids, data):
         #print("idx: ", idx)
         data = np.delete(data, idx, 0)
 
-        #print("length of data: ",data.shape[0])
-
-
+        print("length of data: ",data.shape[0])
         if (unassigned_blocks - EPSILON) == data.shape[0]:
            break
 
@@ -138,7 +136,7 @@ def graph(Districts, data):
         yy.append(c[1])
 
     plt.scatter(xx, yy, color='w')#, marker='o')
-    plt.savefig(str(EPSILON)+".png")
+    plt.savefig(str(EPSILON)+"lyle.png")
     plt.show()
 
 

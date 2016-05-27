@@ -10,7 +10,9 @@ import sys
 
 
 def euclidean_norm(centroid, block):
-	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
+	t1 = (centroid[1] - block[1])
+	t2 = (centroid[2] - block[2])
+	distance = math.sqrt(t1*t1 + t2*t2)
 	return distance
 
 def debug(i_0, j_0, Grid, centroid):
@@ -27,19 +29,15 @@ def neighborhood_to_search(centroid, tol, dim, lat, lon, Grid):
 	return [max(i_0-tol, 0), min(i_0+tol, dim[1]-1)], [max(j_0-tol, 0), min(j_0+tol, dim[0]-1)]
 
 def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
-	#x_range, y_range = neighborhood_to_search(priority_district.centroid, tol, dim, lat, lon)
 	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol, dim, lat, lon, Grid)
-	#print("x range", x_range)
-	#print("y range", y_range)
 	count = 0
 	dist_list = []
 	for i in range(x_range[0], x_range[1]+1):
- 		for j in range(y_range[0], y_range[1]+1):
- 			#print("ij", i, j)
- 			for block in Grid[i][j]:
- 				count += 1
- 				dist = euclidean_norm(priority_district.centroid, block)
- 				dist_list.append([dist, block[0], block[1], block[2], block[3], i, j])
+		for j in range(y_range[0], y_range[1]+1):
+			for block in Grid[i][j]:
+				count += 1
+				dist = euclidean_norm(priority_district.centroid, block)
+				dist_list.append([dist, block[0], block[1], block[2], block[3], i, j])
 
 	#print("counted blocks", count)
 	return dist_list
@@ -62,7 +60,6 @@ def searching_all(filename, number):
 		#if not grid_is_valid(dim, lat, lon, Grid):
 		#	return
 		dist_list = searching_neighborhood(priority_district, tol, Grid, dim, lat, lon)
-		#print(len(dist_list))
 
 		while len(dist_list) == 0:
 			tol += 1
@@ -76,13 +73,13 @@ def searching_all(filename, number):
 		#print("length of dist list", len(dist_list))
 		#print("unheaped items", dist_list[:5])
 		#print('\n')
-		heapq.heapify(dist_list)
+		#heapq.heapify(dist_list)
 		#print("heaped items", dist_list[:5])
 		#print('\n')
 		#print(centroid_l)
 		#print(data.shape[0])
 
-		add_block = dist_list[0]
+		add_block = min(dist_list)
 		priority_district.add_block(add_block[1:-2], Districts)
 		#print("i j:", add_block[5], add_block[6])
 
@@ -93,9 +90,9 @@ def searching_all(filename, number):
 		#if not grid_is_valid(dim, lat, lon, Grid):
 		#	return
 
-		#if unassigned_blocks == (data.shape[0] - EPSILON):
-		#	break
-		print(unassigned_blocks)
+		if unassigned_blocks == (data.shape[0] - EPSILON):
+			break
+		#print(unassigned_blocks)
 		#print("population of priority district", priority_district.population)
 		#print("which district", priority_district.id)
 	graph(Districts, data)
