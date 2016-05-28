@@ -56,11 +56,12 @@ def searching_all(filename, number, centroid_l, statename):
         add_block = min(dist_list)
         priority_district.add_block(add_block[1:-2], Districts)
         Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
-        plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
+        plt.scatter(add_block[3], add_block[2], s=4, color=colors_dict[priority_district.id])
         #if unassigned_blocks == (data.shape[0] - 500):
-         #   graph(Districts, data, centroid_l, statename)
-         #   break
+        #    graph(Districts, data, centroid_l, statename)
+        #    break
         unassigned_blocks -= 1
+        print(unassigned_blocks)
     graph(Districts, data, centroid_l, statename)
 
 def get_colors(Districts):
@@ -80,7 +81,7 @@ def graph(districts, data, centroid_l, statename):
         xx.append(c[2])
         yy.append(c[1])
 
-    plt.scatter(xx, yy, color='w')
+    plt.scatter(xx, yy, color='w', s=8)
     plt.savefig("/home/student/cs123proj/districtpics/" + statename+".png")
     plt.clf()
 
