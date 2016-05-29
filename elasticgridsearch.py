@@ -9,11 +9,11 @@ import itertools
 import boto3
 
 s3 = boto3.resource('s3') 
-#exists = True
 
 class MRStates(MRJob):
     def mapper(self, _, line):
-        #stateline = line.split(", ")
+        line = line.split(',')
+        print(line[0])
         redistrict(str(line[0]), int(line[1]))
 
 def redistrict(filename, number):
@@ -21,12 +21,14 @@ def redistrict(filename, number):
     districts = create_districts(centroid_l)
     statename = (filename[-6:])[0:2]
     #print(statename)
-
     searching_all(filename, number, centroid_l, statename)
 
 def euclidean_norm(centroid, block):
-	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
-	return distance
+    t1 = (centroid[1] - block[1])
+    t2 = (centroid[2] - block[2])
+    distance = math.sqrt(t1*t1 + t2*t2)
+    return distance
+
 def neighborhood_to_search(centroid, tol, dim, lat, lon, Grid):
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
 	return [max(i_0-tol, 0), min(i_0+tol, dim[1]-1)], [max(j_0-tol, 0), min(j_0+tol, dim[0]-1)]
@@ -58,15 +60,12 @@ def searching_all(filename, number, centroid_l, statename):
         add_block = min(dist_list)
         priority_district.add_block(add_block[1:-2], Districts)
         Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
-        plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
-        
-        ###################
-        if unassigned_blocks == (data.shape[0] - 100):
-           break
-        ##################
 
+        plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id], s=2)
+        if unassigned_blocks == (data.shape[0] - 100):
+            graph(Districts, data, centroid_l, statename)
+            break
         unassigned_blocks -= 1
-    graph(Districts, data, centroid_l, statename)
 
 def get_colors(Districts):
     colors_dict = {}
@@ -78,19 +77,39 @@ def get_colors(Districts):
     return colors_dict
 
 def graph(districts, data, centroid_l, statename):
-	#plt.scatter(data[:, 2], data[:, 1], color='k')
     xx = []
     yy = []
     for c in centroid_l:
         xx.append(c[2])
         yy.append(c[1])
 
-    plt.scatter(xx, yy, color='w')
-    plt.savefig(statename + ".png")
+    pic_file = str(statename) + ".png"
+    plt.scatter(xx, yy, color='k', s=6)
+    plt.savefig(statename+".png")
     plt.clf()
+    imagepath = statename + ".png"
+    s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=pic_file).put(Body=open(imagepath, 'rb'))
+
+def get_data_from_s3(filename):
+    '''
+    Input: filename
+    Output: Data in a numpy array of shape (number of censusblocks, 4)
+    Where the 4 fields are unique id, latitude, longitude and population
+    '''
+    info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=filename).get()
+    chunk = info["Body"].read()
+    chunk_string = chunk.decode("utf-8")
+    data = chunk_string.split()
+
+    for i in range(len(data)):
+        data[i] = data[i].split(',')
+
+    data = np.asarray(data[1:], dtype=float, order='F')
+    return data
 
 def create_grid(filename, number):
-    data = np.genfromtxt(filename, delimiter=',', skip_header=True)
+    data = get_data_from_s3(filename)
+
     CB_Per_GB = (data.shape[0]/number)*(2/9)
     eps = 0.00000001
     max_id, max_lat, max_lon, pop = data.max(axis=0)
@@ -115,27 +134,32 @@ def hash_map_index(dim, lat, lon, block):
 	return i, j
 
 def find_random_centroids(filename, number):
+    '''
+    Inputs: filename, number of districts.
+    Outputs: a list of centroids, which are described by
+    unique id, latitude, longitude and population. 
+
+    Choice of centroids is random. 
+    '''
     random.seed(0)
     hash_list = []
     centroid_list = []
     dim, lat, lon, data = create_grid(filename, number)
-    with open(filename, 'r') as f:
-        reader = csv.reader(f)
-        reader = list(reader)
-        start = 0
-        while start < number:
-            random_block = random.sample(reader, 1)[0]
-            hm_tuple = hash_map_index(dim, lat, lon, random_block)
-            if hm_tuple not in hash_list:
-                hash_list.append(hm_tuple)
-                centroid_list.append(random_block)
-                start += 1
+    start = 0
+    while start < number:
+        choice = random.randint(0, len(data)-1)
+        random_block = data[choice]
+        hm_tuple = hash_map_index(dim, lat, lon, random_block)
+        if hm_tuple not in hash_list:
+            hash_list.append(hm_tuple)
+            centroid_list.append(random_block.tolist())
+            start += 1
         centroids = []
-        for c in centroid_list:
-            formatted_c = []
-            for d in c:
-                formatted_c.append(float(d))
-            centroids.append(formatted_c)
+    for c in centroid_list:
+        formatted_c = []
+        for d in c:
+            formatted_c.append(float(d))
+        centroids.append(formatted_c)
     return centroids
 
 	
@@ -192,8 +216,8 @@ class District:
         return self.population < other.population
 
     def __repr__(self):
-        return str(self.centroid)
         #output must be string
+        return str(self.centroid)
 
 def create_districts(centroid_info):
     districts = []

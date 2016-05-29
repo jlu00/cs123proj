@@ -30,8 +30,11 @@ def redistrict(filename, number):
     searching_all(filename, number, centroid_l, statename)
 
 def euclidean_norm(centroid, block):
-	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
-	return distance
+    t1 = (centroid[1] - block[1])
+    t2 = (centroid[2] - block[2])
+    distance = math.sqrt(t1*t1 + t2*t2)
+    return distance
+    
 def neighborhood_to_search(centroid, tol, dim, lat, lon, Grid):
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
 	return [max(i_0-tol, 0), min(i_0+tol, dim[1]-1)], [max(j_0-tol, 0), min(j_0+tol, dim[0]-1)]

@@ -27,8 +27,11 @@ def redistrict(filename, number):
     searching_all(filename, number, centroid_l, statename)
 
 def euclidean_norm(centroid, block):
-	distance = math.sqrt((centroid[1]-block[1])**2+(centroid[2]-block[2])**2)
-	return distance
+    t1 = (centroid[1] - block[1])
+    t2 = (centroid[2] - block[2])
+    distance = math.sqrt(t1*t1 + t2*t2)
+    return distance
+
 def neighborhood_to_search(centroid, tol, dim, lat, lon, Grid):
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
 	return [max(i_0-tol, 0), min(i_0+tol, dim[1]-1)], [max(j_0-tol, 0), min(j_0+tol, dim[0]-1)]
@@ -64,16 +67,18 @@ def searching_all(filename, number, centroid_l, statename):
         '''
         The two lines of code below are to make the CSV. 
         '''
-        block_info = [add_block[2], add_block[3], priority_district.id]
-        new_districts_list.append(block_info)
-        #plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
-        if unassigned_blocks == (data.shape[0] - 10):
+        #block_info = [add_block[2], add_block[3], priority_district.id]
+        #new_districts_list.append(block_info)
+        plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id], s=2)
+        if unassigned_blocks == (data.shape[0] - 2500):
             graph(Districts, data, centroid_l, statename)
             break
+        if unassigned_blocks%100==0:
+            print(unassigned_blocks)
         unassigned_blocks -= 1
-       create_csv(new_districts_list, statename)
+       #create_csv(new_districts_list, statename)
     #graph(Districts, data, centroid_l, statename)
-
+'''
 def create_csv(new_districts_list, statename):
     with open("/home/student/cs123proj/" + statename + 'districts.csv', 'w') as dictfile:
         dwriter = csv.writer(dictfile, delimiter=',',
@@ -81,7 +86,7 @@ def create_csv(new_districts_list, statename):
         for item in new_districts_list:
             dwriter.writerow(item)
     dictfile.close()
-
+'''
 def get_colors(Districts):
     colors_dict = {}
     colormap = plt.cm.Accent
@@ -94,7 +99,7 @@ def get_colors(Districts):
 
 def graph(districts, data, centroid_l, statename):
 	#plt.scatter(data[:, 2], data[:, 1], color='k')
-    im = io.BytesIO()
+    #im = io.BytesIO()
     xx = []
     yy = []
     for c in centroid_l:
@@ -102,15 +107,15 @@ def graph(districts, data, centroid_l, statename):
         yy.append(c[1])
 
     pic_file = str(statename) + ".png"
-    plt.scatter(xx, yy, color='w')
-    plt.savefig("test.png")
+    plt.scatter(xx, yy, color='k', s=6)
+    plt.savefig(statename+".png")
     
     plt.clf()
-    im.seek(0)
-    imagedata = base64.b64encode(im.read())
-    print(imagedata, "hello")
-    
-    s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=pic_file).put(imagedata)
+    #im.seek(0)
+    #imagedata = base64.b64encode(im.read())
+    #print(imagedata, "hello")
+    imagepath = "/home/ec2-user/" + statename + ".png"
+    s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=pic_file).put(Body=open(imagepath, 'rb'))
 
 def get_data_from_s3(filename):
     info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=filename).get()
@@ -172,12 +177,14 @@ def find_random_centroids(filename, number, statename):
         for d in c:
             formatted_c.append(float(d))
         centroids.append(formatted_c)
+    '''
     with open("/home/student/cs123proj/" + statename + 'centroids.csv', 'w') as cfile:
         cwriter = csv.writer(cfile, delimiter=',',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
         for c in centroids:
             cwriter.writerow(c)
     cfile.close()
+    '''
     return centroids
 
 	
@@ -251,4 +258,5 @@ def create_districts(centroid_info):
 def return_low_pop(districts):
     return heapq.heappop(districts)
 
-redistrict('IL.csv', 19)
+redistrict('HI.csv', 2)
+#redistrict('NH.csv', 2)
