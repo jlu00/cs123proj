@@ -6,24 +6,22 @@ import csv
 import math
 import matplotlib.pyplot as plt
 import itertools
+import io
+import urllib, base64
 import boto3
-
 s3 = boto3.resource('s3') 
 
-class MRStates(MRJob):
-    def mapper(self, _, line):
-        stateline = line.split(", ")
+#class MRStates(MRJob):
+#    def mapper(self, _, line):
 
-        #s3 = boto3.resource('s3') 
+#        redistrict(str(stateline[0]), int(stateline[1]))
 
-        #info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=str(stateline[0])).get()
-        #chunk = info["Body"].read()
-        redistrict(str(stateline[0]), int(stateline[1]))
+
 
 def redistrict(filename, number):
     centroid_l = find_random_centroids(filename, number)
     districts = create_districts(centroid_l)
-    statename = (filename[-6:])[0:2]
+    statename = str(filename[0:2])
     print(statename)
 
     searching_all(filename, number, centroid_l, statename)
@@ -62,13 +60,13 @@ def searching_all(filename, number, centroid_l, statename):
         add_block = min(dist_list)
         priority_district.add_block(add_block[1:-2], Districts)
         Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
-        plt.scatter(add_block[3], add_block[2], s=4, color=colors_dict[priority_district.id])
-        #if unassigned_blocks == (data.shape[0] - 500):
-        #    graph(Districts, data, centroid_l, statename)
-        #    break
+        plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
+        if unassigned_blocks == (data.shape[0] - 10):
+            graph(Districts, data, centroid_l, statename)
+            break
         unassigned_blocks -= 1
         print(unassigned_blocks)
-    graph(Districts, data, centroid_l, statename)
+    #graph(Districts, data, centroid_l, statename)
 
 def get_colors(Districts):
     colors_dict = {}
@@ -79,17 +77,24 @@ def get_colors(Districts):
         colors_dict[district.id] = c
     return colors_dict
 
+
 def graph(districts, data, centroid_l, statename):
 	#plt.scatter(data[:, 2], data[:, 1], color='k')
+    im = io.BytesIO()
     xx = []
     yy = []
     for c in centroid_l:
         xx.append(c[2])
         yy.append(c[1])
 
-    plt.scatter(xx, yy, color='w', s=8)
-    plt.savefig("/home/student/cs123proj/districtpics/" + statename+".png")
+    pic_file = str(statename) + ".pdf"
+    plt.scatter(xx, yy, color='w')
+    plt.savefig(im, format='pdf')
     plt.clf()
+    im.seek(0)
+    imagedata = base64.b64encode(im.read())
+    
+    s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=pic_file).put(pic_file)
 
 def get_data_from_s3(filename):
     info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=filename).get()
@@ -103,8 +108,8 @@ def get_data_from_s3(filename):
     data = np.asarray(data[1:], dtype=float, order='F')
     return data
 
-def create_grid(data, number):
-
+def create_grid(filename, number):
+    data = get_data_from_s3(filename)
 
     #data = np.genfromtxt(filename, delimiter=',', skip_header=True)
 
@@ -224,5 +229,4 @@ def create_districts(centroid_info):
 def return_low_pop(districts):
     return heapq.heappop(districts)
 
-if __name__ == '__main__':
-	MRStates.run()
+redistrict('IL.csv', 19)
