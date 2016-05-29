@@ -72,17 +72,15 @@ def searching_all(filename, number, centroid_l, statename):
             break
         unassigned_blocks -= 1
         print(unassigned_blocks)
-    create_csv(new_districts_list)
+    create_csv(new_districts_list, statename)
     #graph(Districts, data, centroid_l, statename)
 
-def create_csv(new_districts_list):
-    with open("/home/student/cs123proj/" + 'statedict.csv', 'w') as dictfile:
+def create_csv(new_districts_list, statename):
+    with open("/home/student/cs123proj/" + statename + 'districts.csv', 'w') as dictfile:
         dwriter = csv.writer(dictfile, delimiter=',',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
         for item in new_districts_list:
             dwriter.writerow(item)
-            #for item in statedict[key]:
-            #    dwriter.writerow(item)
     dictfile.close()
         
 
@@ -167,7 +165,7 @@ def find_random_centroids(filename, number, statename):
         for d in c:
             formatted_c.append(float(d))
         centroids.append(formatted_c)
-    with open("/home/student/cs123proj/" + 'centroids.csv', 'w') as cfile:
+    with open("/home/student/cs123proj/" + statename + 'centroids.csv', 'w') as cfile:
         cwriter = csv.writer(cfile, delimiter=',',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
         for c in centroids:

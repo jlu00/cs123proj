@@ -18,9 +18,10 @@ s3 = boto3.resource('s3')
 #        redistrict(str(stateline[0]), int(stateline[1]))
 
 def redistrict(filename, number):
-    centroid_l = find_random_centroids(filename, number)
-    districts = create_districts(centroid_l)
     statename = str(filename[0:2])
+    centroid_l = find_random_centroids(filename, number, statename)
+    districts = create_districts(centroid_l)
+    
     print(statename)
 
     searching_all(filename, number, centroid_l, statename)
@@ -59,13 +60,27 @@ def searching_all(filename, number, centroid_l, statename):
         add_block = min(dist_list)
         priority_district.add_block(add_block[1:-2], Districts)
         Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
-        plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
+        
+        '''
+        The two lines of code below are to make the CSV. 
+        '''
+        block_info = [add_block[2], add_block[3], priority_district.id]
+        new_districts_list.append(block_info)
+        #plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
         if unassigned_blocks == (data.shape[0] - 10):
             graph(Districts, data, centroid_l, statename)
             break
         unassigned_blocks -= 1
-        print(unassigned_blocks)
+       create_csv(new_districts_list, statename)
     #graph(Districts, data, centroid_l, statename)
+
+def create_csv(new_districts_list, statename):
+    with open("/home/student/cs123proj/" + statename + 'districts.csv', 'w') as dictfile:
+        dwriter = csv.writer(dictfile, delimiter=',',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        for item in new_districts_list:
+            dwriter.writerow(item)
+    dictfile.close()
 
 def get_colors(Districts):
     colors_dict = {}
@@ -137,7 +152,7 @@ def hash_map_index(dim, lat, lon, block):
 	i = (dim[1]-1) - _i
 	return i, j
 
-def find_random_centroids(filename, number):
+def find_random_centroids(filename, number, statename):
     random.seed(0)
     hash_list = []
     centroid_list = []
@@ -157,6 +172,12 @@ def find_random_centroids(filename, number):
         for d in c:
             formatted_c.append(float(d))
         centroids.append(formatted_c)
+    with open("/home/student/cs123proj/" + statename + 'centroids.csv', 'w') as cfile:
+        cwriter = csv.writer(cfile, delimiter=',',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        for c in centroids:
+            cwriter.writerow(c)
+    cfile.close()
     return centroids
 
 	
