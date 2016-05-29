@@ -6,9 +6,10 @@ import csv
 import math
 import matplotlib.pyplot as plt
 import itertools
-import boto3
 
-s3 = boto3.resource('s3') 
+#import boto3
+
+#s3 = boto3.resource('s3') 
 
 class MRStates(MRJob):
     def mapper(self, _, line):
@@ -18,12 +19,12 @@ class MRStates(MRJob):
 
         #info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=str(stateline[0])).get()
         #chunk = info["Body"].read()
-        redistrict(str(stateline[0]), int(stateline[1]))
+        redistrict("/home/student/cs123proj/statecsv/" + str(stateline[0]), int(stateline[1]))
 
 def redistrict(filename, number):
-    centroid_l = find_random_centroids(filename, number)
-    districts = create_districts(centroid_l)
     statename = (filename[-6:])[0:2]
+    centroid_l = find_random_centroids(filename, number, statename)
+    districts = create_districts(centroid_l)
     print(statename)
 
     searching_all(filename, number, centroid_l, statename)
@@ -48,6 +49,7 @@ def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
 	return dist_list
 
 def searching_all(filename, number, centroid_l, statename):
+    new_districts_list = []
     Grid, data, dim, lat, lon = build_grid(filename, number)
     Districts = create_districts(centroid_l)
     unassigned_blocks = data.shape[0]
@@ -62,13 +64,27 @@ def searching_all(filename, number, centroid_l, statename):
         add_block = min(dist_list)
         priority_district.add_block(add_block[1:-2], Districts)
         Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
-        plt.scatter(add_block[3], add_block[2], s=4, color=colors_dict[priority_district.id])
-        #if unassigned_blocks == (data.shape[0] - 500):
-        #    graph(Districts, data, centroid_l, statename)
-        #    break
+        block_info = [add_block[2], add_block[3], priority_district.id]
+        new_districts_list.append(block_info)
+        #plt.scatter(add_block[3], add_block[2], s=4, color=colors_dict[priority_district.id])
+        if unassigned_blocks == (data.shape[0] - 10):
+            graph(Districts, data, centroid_l, statename)
+            break
         unassigned_blocks -= 1
         print(unassigned_blocks)
-    graph(Districts, data, centroid_l, statename)
+    create_csv(new_districts_list)
+    #graph(Districts, data, centroid_l, statename)
+
+def create_csv(new_districts_list):
+    with open("/home/student/cs123proj/" + 'statedict.csv', 'w') as dictfile:
+        dwriter = csv.writer(dictfile, delimiter=',',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        for item in new_districts_list:
+            dwriter.writerow(item)
+            #for item in statedict[key]:
+            #    dwriter.writerow(item)
+    dictfile.close()
+        
 
 def get_colors(Districts):
     colors_dict = {}
@@ -103,10 +119,10 @@ def get_data_from_s3(filename):
     data = np.asarray(data[1:], dtype=float, order='F')
     return data
 
-def create_grid(data, number):
+def create_grid(filename, number):
 
 
-    #data = np.genfromtxt(filename, delimiter=',', skip_header=True)
+    data = np.genfromtxt(filename, delimiter=',', skip_header=True)
 
     CB_Per_GB = (data.shape[0]/number)*(2/9)
     eps = 0.00000001
@@ -131,7 +147,7 @@ def hash_map_index(dim, lat, lon, block):
 	i = (dim[1]-1) - _i
 	return i, j
 
-def find_random_centroids(filename, number):
+def find_random_centroids(filename, number, statename):
     random.seed(0)
     hash_list = []
     centroid_list = []
@@ -151,6 +167,12 @@ def find_random_centroids(filename, number):
         for d in c:
             formatted_c.append(float(d))
         centroids.append(formatted_c)
+    with open("/home/student/cs123proj/" + 'centroids.csv', 'w') as cfile:
+        cwriter = csv.writer(cfile, delimiter=',',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        for c in centroids:
+            cwriter.writerow(c)
+    cfile.close()
     return centroids
 
 	

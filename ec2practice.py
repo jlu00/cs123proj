@@ -1,4 +1,4 @@
-from mrjob.job import MRJob
+#from mrjob.job import MRJob
 import numpy as np
 import heapq
 import random
@@ -86,15 +86,16 @@ def graph(districts, data, centroid_l, statename):
         xx.append(c[2])
         yy.append(c[1])
 
-    #pic_file = str(statename) + ".pdf"
+    pic_file = str(statename) + ".png"
     plt.scatter(xx, yy, color='w')
     plt.savefig("test.png")
     
-    #plt.clf()
-    #im.seek(0)
-    #imagedata = base64.b64encode(im.read())
+    plt.clf()
+    im.seek(0)
+    imagedata = base64.b64encode(im.read())
+    print(imagedata, "hello")
     
-    #s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=pic_file).put(pic_file)
+    s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=pic_file).put(imagedata)
 
 def get_data_from_s3(filename):
     info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=filename).get()
