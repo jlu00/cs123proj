@@ -5,7 +5,6 @@ import random
 import csv
 import math
 import matplotlib.pyplot as plt
-import os
 import itertools
 import boto3
 

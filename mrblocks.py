@@ -5,14 +5,20 @@ import random
 import csv
 import math
 import matplotlib.pyplot as plt
-import os
 import itertools
+import boto3
 
+s3 = boto3.resource('s3') 
 
 class MRStates(MRJob):
     def mapper(self, _, line):
         stateline = line.split(", ")
-        redistrict("/home/student/cs123proj/statecsv/"+ str(stateline[0]), int(stateline[1]))
+
+        #s3 = boto3.resource('s3') 
+
+        #info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=str(stateline[0])).get()
+        #chunk = info["Body"].read()
+        redistrict(str(stateline[0]), int(stateline[1]))
 
 def redistrict(filename, number):
     centroid_l = find_random_centroids(filename, number)
@@ -84,8 +90,23 @@ def graph(districts, data, centroid_l, statename):
     plt.savefig("/home/student/cs123proj/districtpics/" + statename+".png")
     plt.clf()
 
-def create_grid(filename, number):
-    data = np.genfromtxt(filename, delimiter=',', skip_header=True)
+def get_data_from_s3(filename):
+    info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=filename).get()
+    chunk = info["Body"].read()
+    chunk_string = chunk.decode("utf-8")
+    data = chunk_string.split()
+
+    for i in range(len(data)):
+        data[i] = data[i].split(',')
+
+    data = np.asarray(data[1:], dtype=float, order='F')
+    return data
+
+def create_grid(data, number):
+
+
+    #data = np.genfromtxt(filename, delimiter=',', skip_header=True)
+
     CB_Per_GB = (data.shape[0]/number)*(2/9)
     eps = 0.00000001
     max_id, max_lat, max_lon, pop = data.max(axis=0)
@@ -114,23 +135,21 @@ def find_random_centroids(filename, number):
     hash_list = []
     centroid_list = []
     dim, lat, lon, data = create_grid(filename, number)
-    with open(filename, 'r') as f:
-        reader = csv.reader(f)
-        reader = list(reader)
-        start = 0
-        while start < number:
-            random_block = random.sample(reader, 1)[0]
-            hm_tuple = hash_map_index(dim, lat, lon, random_block)
-            if hm_tuple not in hash_list:
-                hash_list.append(hm_tuple)
-                centroid_list.append(random_block)
-                start += 1
+    start = 0
+    while start < number:
+        choice = random.randint(0, len(data)-1)
+        random_block = data[choice]
+        hm_tuple = hash_map_index(dim, lat, lon, random_block)
+        if hm_tuple not in hash_list:
+            hash_list.append(hm_tuple)
+            centroid_list.append(random_block.tolist())
+            start += 1
         centroids = []
-        for c in centroid_list:
-            formatted_c = []
-            for d in c:
-                formatted_c.append(float(d))
-            centroids.append(formatted_c)
+    for c in centroid_list:
+        formatted_c = []
+        for d in c:
+            formatted_c.append(float(d))
+        centroids.append(formatted_c)
     return centroids
 
 	

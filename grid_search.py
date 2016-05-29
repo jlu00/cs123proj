@@ -7,7 +7,9 @@ import heapq
 import matplotlib.pyplot as plt
 import itertools
 import sys
+import boto3
 
+s3 = boto3.resource('s3') 
 
 def euclidean_norm(centroid, block):
 	t1 = (centroid[1] - block[1])
@@ -129,10 +131,16 @@ def graph(Districts, data):
 	plt.savefig(str(EPSILON)+".png")
 	plt.show()
 
+
+
+searching_all(s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key='IL.csv').key, 20)
+
+
+
 #data = np.genfromtxt("IL.csv", delimiter=',', skip_header=True)
 #plt.scatter(data[:, 2], data[:, 1])
 #plt.savefig("raw.png")
-
+'''
 if __name__ == "__main__":
 	if int(sys.argv[2]) <= 1:
 		print("Not enough number of districts.")
@@ -142,3 +150,4 @@ if __name__ == "__main__":
 	DISTRICTS = dc.create_districts(CENTROID_L)
 	EPSILON = int(sys.argv[3])
 	searching_all(sys.argv[1], int(sys.argv[2]))
+'''
