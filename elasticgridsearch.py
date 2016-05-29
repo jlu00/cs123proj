@@ -14,7 +14,7 @@ s3 = boto3.resource('s3')
 class MRStates(MRJob):
     def mapper(self, _, line):
         #stateline = line.split(", ")
-        redistrict(s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=line[0]).key, line[1])
+        redistrict(str(line[0]), int(line[1]))
 
 def redistrict(filename, number):
     centroid_l = find_random_centroids(filename, number)

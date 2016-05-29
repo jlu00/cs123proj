@@ -11,7 +11,11 @@ def create_grid(filename, number):
 	[ [id, lat, long, pop],
 	  [id, lat, long, pop] ]
 	'''
+
+
+	
 	data = np.genfromtxt(filename, delimiter=',', skip_header=True)
+	
 	CB_Per_GB = (data.shape[0]/number)*(2/9)
 	
 	eps = 0.00000001

@@ -11,6 +11,29 @@ import boto3
 
 s3 = boto3.resource('s3') 
 
+info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key='IL.csv').get()
+chunk = info["Body"].read()
+
+
+#convert chunk into string
+chunk_string = chunk.decode("utf-8")
+data = chunk_string.split()
+
+for i in range(len(data)):
+	data[i] = data[i].split(',')
+
+data = np.asarray(data, dtype=float, order='F')
+
+
+
+#data = np.genfromtxt('chunk_string', delimiter=',', skip_header=True)
+
+
+searching_all(s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key='IL.csv').key, 20)
+
+
+
+
 def euclidean_norm(centroid, block):
 	t1 = (centroid[1] - block[1])
 	t2 = (centroid[2] - block[2])
@@ -133,7 +156,6 @@ def graph(Districts, data):
 
 
 
-searching_all(s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key='IL.csv').key, 20)
 
 
 

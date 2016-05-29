@@ -9,14 +9,13 @@ import itertools
 import io
 import urllib, base64
 import boto3
+
 s3 = boto3.resource('s3') 
 
 #class MRStates(MRJob):
 #    def mapper(self, _, line):
 
 #        redistrict(str(stateline[0]), int(stateline[1]))
-
-
 
 def redistrict(filename, number):
     centroid_l = find_random_centroids(filename, number)
@@ -87,14 +86,15 @@ def graph(districts, data, centroid_l, statename):
         xx.append(c[2])
         yy.append(c[1])
 
-    pic_file = str(statename) + ".pdf"
+    #pic_file = str(statename) + ".pdf"
     plt.scatter(xx, yy, color='w')
-    plt.savefig(im, format='pdf')
-    plt.clf()
-    im.seek(0)
-    imagedata = base64.b64encode(im.read())
+    plt.savefig("test.png")
     
-    s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=pic_file).put(pic_file)
+    #plt.clf()
+    #im.seek(0)
+    #imagedata = base64.b64encode(im.read())
+    
+    #s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=pic_file).put(pic_file)
 
 def get_data_from_s3(filename):
     info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=filename).get()
