@@ -11,19 +11,35 @@ import boto3
 s3 = boto3.resource('s3') 
 
 class MRStates(MRJob):
+    '''
+    Inputs: the line which has the STATE.csv filename
+    and the number of districts.
+    '''
     def mapper(self, _, line):
         line = line.split(',')
-        print(line[0])
         redistrict(str(line[0]), int(line[1]))
 
 def redistrict(filename, number):
+    '''
+    Inputs: filename and number of districts
+    Outputs: None
+
+    Calls the find_random_centroids function to 
+    make a list of random centroids. 
+    Calls the create_districts function to create district
+    classes from the centroid list. 
+    Calls searching_all function to redistrict the state.
+    '''
     centroid_l = find_random_centroids(filename, number)
     districts = create_districts(centroid_l)
-    statename = (filename[-6:])[0:2]
-    #print(statename)
+    statename = filename[0:2]
     searching_all(filename, number, centroid_l, statename)
 
 def euclidean_norm(centroid, block):
+    '''
+    Inputs: centroid array and block array 
+    OUtputs: returns the euclidean difference between the two.
+    '''
     t1 = (centroid[1] - block[1])
     t2 = (centroid[2] - block[2])
     distance = math.sqrt(t1*t1 + t2*t2)
@@ -70,6 +86,12 @@ def searching_all(filename, number, centroid_l, statename):
     #graph(Districts, data, centroid_l, statename)
 
 def get_colors(Districts):
+    '''
+    Inputs: a list of district classes
+    Outputs: colors_dict, a dictionary with district id 
+            as the key and the color code from the 
+            Accent color map library as the value. 
+    '''
     colors_dict = {}
     colormap = plt.cm.Accent
     colors = itertools.cycle([colormap(i) for i in np.linspace(0, 0.9, len(Districts))])
