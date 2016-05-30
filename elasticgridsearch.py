@@ -62,7 +62,7 @@ def searching_all(filename, number, centroid_l, statename):
         Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 
         plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id], s=2)
-        if unassigned_blocks == (data.shape[0] - 50000):
+        if unassigned_blocks == (data.shape[0] - 10000):
             graph(Districts, data, centroid_l, statename)
             break
         unassigned_blocks -= 1
@@ -78,6 +78,7 @@ def get_colors(Districts):
     return colors_dict
 
 def graph(districts, data, centroid_l, statename):
+    plt.scatter(data[:, 2], data[:, 1], color='k')
     xx = []
     yy = []
     for c in centroid_l:
@@ -85,7 +86,7 @@ def graph(districts, data, centroid_l, statename):
         yy.append(c[1])
 
     pic_file = str(statename) + ".png"
-    plt.scatter(xx, yy, color='k', s=6)
+    plt.scatter(xx, yy, color='w', s=6)
     plt.savefig(statename+".png")
     plt.clf()
     imagepath = statename + ".png"
