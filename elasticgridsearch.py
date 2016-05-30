@@ -62,7 +62,7 @@ def searching_all(filename, number, centroid_l, statename):
         Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 
         plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id], s=2)
-        if unassigned_blocks == (data.shape[0] - 50000):
+        if unassigned_blocks == (data.shape[0] - 50001):
             graph(Districts, data, centroid_l, statename)
             break
         unassigned_blocks -= 1
