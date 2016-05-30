@@ -47,6 +47,7 @@ def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
 
 def searching_all(filename, number, centroid_l, statename):
     Grid, data, dim, lat, lon = build_grid(filename, number)
+    plt.scatter(data[:, 2], data[:, 1], color='k')
     Districts = create_districts(centroid_l)
     unassigned_blocks = data.shape[0]
     colors_dict = get_colors(Districts)
@@ -78,7 +79,6 @@ def get_colors(Districts):
     return colors_dict
 
 def graph(districts, data, centroid_l, statename):
-    plt.scatter(data[:, 2], data[:, 1], color='k')
     xx = []
     yy = []
     for c in centroid_l:
