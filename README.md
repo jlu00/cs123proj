@@ -1,1 +1,24 @@
 # cs123proj
+Alyssa Blackburn, Lyle Kim and Jessica Lu
+
+Files: 
+
+Main directory:
+elasticgridsearch.py: Our main function and contains the District class and map reduce command. Runs on an EC2 instance or with EMR and saves to s3 buckets using boto3. Given a state's CSV file with all its blocks, redistricts according to population and graphs to a png file, which it then saves to an s3 bucket.
+ 
+parse_data.py: Takes a state's 00001 uf1 and geo uf1 file and parses for the relevant data: all the census blocks in the state, with a unique ID, latitude, longitude and population. Simply extract these two files from the data directory and run with the state's abbreviation (e.g. "il" for Illinois) and your parsed csv will be saved in the main directory. Our finished parsed csvs are located in the directory "statescsv." (The data directory has since been deleted as uploading it would just basically be a big data dump).
+
+state.csv:
+to be fed into the mapper: each line has the name of the CSV where the block information is held, along with the number of distircts for that state.
+
+Data directory (now deleted):
+All the 00001 uf1 and geo uf1 zip files from the AWS public dataset. 
+
+actual_districts directory: 
+Contains pictures of the of what the actual 2000 census districts looked like from the shapefiles. 
+
+districtpics directory: 
+pictures of our redistricted (or partially redistricted) states. 
+
+statecsv directory:
+All the state CSV files after it has been parsed by parse_data.py as described above. 
