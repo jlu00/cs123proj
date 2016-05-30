@@ -46,10 +46,18 @@ def euclidean_norm(centroid, block):
     return distance
 
 def neighborhood_to_search(centroid, tol, dim, lat, lon, Grid):
+    '''
+    Inputs:
+    Outputs:
+    '''
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
 	return [max(i_0-tol, 0), min(i_0+tol, dim[1]-1)], [max(j_0-tol, 0), min(j_0+tol, dim[0]-1)]
 
 def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
+    '''
+    Inputs: 
+    Outputs:
+    '''
 	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol, dim, lat, lon, Grid)
 	count = 0
 	dist_list = []
@@ -62,6 +70,10 @@ def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
 	return dist_list
 
 def searching_all(filename, number, centroid_l, statename):
+    '''
+    Inputs:
+    Outputs:
+    '''
     Grid, data, dim, lat, lon = build_grid(filename, number)
     plt.scatter(data[:, 2], data[:, 1], color='k')
     Districts = create_districts(centroid_l)
@@ -77,13 +89,14 @@ def searching_all(filename, number, centroid_l, statename):
         add_block = min(dist_list)
         priority_district.add_block(add_block[1:-2], Districts)
         Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
-
-        plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id], s=2)
-        if unassigned_blocks == (data.shape[0] - 10000):
-            graph(Districts, data, centroid_l, statename)
-            break
+        plt.scatter(add_block[3], add_block[2], 
+                    color=colors_dict[priority_district.id], s=2)
+        #The commented out code below allowed us test with smaller sample sizes, where
+        #epsilon would be replaced with the number of blocks we wanted to use.
+        #if unassigned_blocks == (data.shape[0] - epsilon):
+        #   break
         unassigned_blocks -= 1
-    #graph(Districts, data, centroid_l, statename)
+    graph(Districts, centroid_l, statename) #graphs the centroids 
 
 def get_colors(Districts):
     '''
@@ -100,7 +113,11 @@ def get_colors(Districts):
         colors_dict[district.id] = c
     return colors_dict
 
-def graph(districts, data, centroid_l, statename):
+def graph(districts, centroid_l, statename):
+    '''
+    Inputs: list of district classes, the list of centroids, the name of the state.
+    Outputs: Saves a png of the graphed result into the s3Bucket. 
+    '''
     xx = []
     yy = []
     for c in centroid_l:
@@ -132,6 +149,10 @@ def get_data_from_s3(filename):
     return data
 
 def create_grid(filename, number):
+    '''
+    Inputs: The name of the file and the number of districts.
+    Outputs: 
+    '''
     data = get_data_from_s3(filename)
 
     CB_Per_GB = (data.shape[0]/number)*(2/9)
@@ -149,6 +170,10 @@ def create_grid(filename, number):
     return [int(math.ceil(x_num)), int(math.ceil(y_num))], [min_lat, max_lat], [min_lon, max_lon], data
 
 def hash_map_index(dim, lat, lon, block):
+    '''
+    Inputs:
+    Outputs:
+    '''
 	x_size = (lon[1] - lon[0]) / dim[0]
 	y_size = (lat[1] - lat[0]) / dim[1]
 	_j = int((float(block[2]) - lon[0]) / x_size) 
@@ -188,6 +213,10 @@ def find_random_centroids(filename, number):
 
 	
 def grid_is_valid(dim, lat, lon, Grid):
+    '''
+    Inputs:
+    Outputs:
+    '''
 	count = 0
 	for x in range(dim[1]):
 		for y in range(dim[0]):
@@ -201,6 +230,10 @@ def grid_is_valid(dim, lat, lon, Grid):
 	return True
 
 def build_grid(filename, number):
+    '''
+    Inputs:
+    Outputs:
+    '''
     dim, lat, lon, data = create_grid(filename, number)
     Master_Grid = []
     for r in range(dim[1]):
@@ -218,6 +251,9 @@ def build_grid(filename, number):
     return Master_Grid, data, dim, lat, lon
 
 class District:
+    '''
+    Builds the district class with a centroid coordinate.
+    '''
     def __init__(self, centroid, district_id):
         self.blocks = []
         self.id = district_id
@@ -229,11 +265,19 @@ class District:
         self.population = centroid[3]
 
     def add_block(self, block, district_list):
+        '''
+        Inputs: the block array and a list of districts
+
+        Adds a block to the district's list of blocks. 
+        '''
         self.blocks.append(block)
         self.population += block[3]
         heapq.heappush(district_list, self)
 
     def return_population(self):
+        '''
+        Returns the population of the District.
+        '''
         return self.population
 
     def __lt__(self, other):
@@ -244,17 +288,26 @@ class District:
         return str(self.centroid)
 
 def create_districts(centroid_info):
+    '''
+    Inputs: The list of centroid arrays
+    Outputs: a list of district classes.
+
+    Makes a list of district classes where
+    each district uses an element from centroid.
+    '''
     districts = []
     i = 0
     for c in centroid_info:
         new_district = District(c, i)
         districts.append(new_district)
         i+=1        
-
     heapq.heapify(districts)
     return districts 
 
 def return_low_pop(districts):
+    '''
+    Returns the district with the lowest population with heapop.
+    '''
     return heapq.heappop(districts)
 
 if __name__ == '__main__':
