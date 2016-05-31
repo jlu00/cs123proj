@@ -1,11 +1,11 @@
+from mrjob.job import MRJob
 import numpy as np
+import heapq
+import random
+import csv
 import math
-from grid import build_grid, hash_map_index, grid_is_valid, find_random_centroids
-#from centroids import find_random_centroids
-import heapq 
 import matplotlib.pyplot as plt
 import itertools
-import sys
 import boto3
 
 s3 = boto3.resource('s3') 
