@@ -33,6 +33,7 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 
 Districts = dc.create_districts(centroid_l, 1)
 
+def rm_centroids_from_data(centroids, data):
 '''
 Inputs: list of centroids (ex: centroid_l above), 
         data = numpy array of blocks where each block is a list of 
@@ -43,12 +44,12 @@ This function deletes the centroids
 from the data so that find_nearest_block function does not return 
 one of the centroids itself
 '''
-def rm_centroids_from_data(centroids, data):
     for centroid in centroids:
         idx = np.where(data[:,0] == centroid[0])
         data = np.delete(data, idx[0][0], 0)
     return data
 
+def euclidean_norm(centroid, block):
 '''
 Inputs: a block (list), a centroid (list)
 Outputs: typical Euclidean norm
@@ -58,12 +59,12 @@ Initially we used explicit squaring (**)
 but Nick suggested that explicit repeated multiplication is slightly faster
 than using ** to sqaure.
 '''
-def euclidean_norm(centroid, block):
     t1 = (centroid[1] - block[1])
     t2 = (centroid[2] - block[2])
     distance = math.sqrt(t1*t1 + t2*t2)
     return distance
 
+def assign_blocks(centroids, data):
 '''
 Inputs: list of centroids
         numpy array of blocks
@@ -79,7 +80,6 @@ This function assigns each block to one of the centroids.
 5) the district absorbs the nearest block, recalculates the population
 6) repeat 2~5 until every block has been assigned
 '''
-def assign_blocks(centroids, data):
     data = rm_centroids_from_data(centroid_l, data)
 
     while data.shape[0] != 0:

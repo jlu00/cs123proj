@@ -43,6 +43,7 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 [351295,+41.284644,-088.114612,114],
 [365115,+40.629956,-089.275667,12]]
 
+def rm_centroids_from_data(centroids, data):
 '''
 Inputs: list of centroids (ex: centroid_l above), 
         data = numpy array of blocks where each block is a list of 
@@ -53,12 +54,12 @@ This function deletes the centroids
 from the data so that find_nearest_block function does not return 
 one of the centroids itself
 '''
-def rm_centroids_from_data(centroids, data):
     for centroid in centroids:
         idx = np.where(data[:,0] == centroid[0])
         data = np.delete(data, idx, 0)
     return data
 
+def euclidean_norm(block, centroid):
 '''
 Inputs: a block (list), a centroid (list)
 Outputs: typical Euclidean norm
@@ -68,13 +69,13 @@ Initially we used explicit squaring (**)
 but Nick suggested that explicit repeated multiplication is slightly faster
 than using ** to sqaure.
 '''
-def euclidean_norm(block, centroid):
     t1 = (centroid[1] - block[1])
     t2 = (centroid[2] - block[2])
     distance = math.sqrt(t1*t1 + t2*t2)
     return [distance, block[0], block[1], block[2], block[3]]
     #reference: block[0] = num; block[1] = lat; block[2] = lon; block[3] = pop
 
+def find_nearest_block(data, centroid, q):
 '''
 Inputs: data(list of blocks), a centroid, a queue
 Outputs: puts the block that's nearest from the input centroid
@@ -84,7 +85,6 @@ and a centroid.
 The closest block and it's information consisting of the unique ID number of the block,
 lattitude, longidute, and population is put into a queue for multiprocessing
 '''
-def find_nearest_block(data, centroid, q):
     distance_list = []
     for i in range(data.shape[0]):
         distance = euclidean_norm(centroid, data[i][:])
@@ -92,6 +92,7 @@ def find_nearest_block(data, centroid, q):
         #data[i][0] = num; data[i][1] = lat; data[i][2] = lon; data[i][3] = pop
     q.put(min(distance_list))
 
+def split_data(data, chunksize):
 '''
 Input: data (numpy array of blocks), chunksize (integer)
 Output: Numpy array of splitted data into 'chunksize' chunks
@@ -99,9 +100,9 @@ Output: Numpy array of splitted data into 'chunksize' chunks
 This function manually splits up the data into 'chunksize' chunks
 and each will be the input to one of the processors
 '''
-def split_data(data, chunksize):
     return np.array_split(data, chunksize)
 
+def assign_blocks(centroids, data, processes):
 '''
 Inputs: list of centroids
         numpy array of blocks
@@ -115,7 +116,6 @@ after consulting with Professor Wachs, we manually splitted up
 the data into chunks and input each split chunk to each processor
 which turned out to be approximately 'processes' times faster 
 '''
-def assign_blocks(centroids, data, processes):
     Districts = dc.create_districts(centroids)
     data = rm_centroids_from_data(centroids, data)
 
