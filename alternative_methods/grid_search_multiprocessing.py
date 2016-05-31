@@ -52,7 +52,15 @@ def neighborhood_to_search(centroid, tol, dim, lat, lon, Grid):
 	i_0, j_0 = hash_map_index(dim, lat, lon, centroid)
 	return [max(i_0-tol, 0), min(i_0+tol, dim[1]-1)], [max(j_0-tol, 0), min(j_0+tol, dim[0]-1)]
 
+
 def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
+'''
+Inputs: priority_district, tolerance, Grid, dimension, lat, lon
+Outputs: numpry array of the subset of the data (list of blocks)
+
+This function returns numpy array of blocks that is a much smaller subset of
+the original dataset.
+'''
 	x_range, y_range = neighborhood_to_search(priority_district.centroid, tol, dim, lat, lon, Grid)
 	count = 0
 
@@ -64,6 +72,13 @@ def searching_neighborhood(priority_district, tol, Grid, dim, lat, lon):
 
 	return np.asarray(subset)
 
+'''
+This function implements the multiprocessing technique that was 
+tested in linear_search_multiprocessing.py. 
+Even though the technique expedited linear_search.py by approximately
+the number of processors times faster, it turned out that 
+implementing the same technique to grid_search.py slows down the code.
+'''
 def searching_all(filename, number):
 	Grid, data, dim, lat, lon = build_grid(filename, number)
 	
