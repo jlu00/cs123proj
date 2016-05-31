@@ -157,13 +157,13 @@ def hash_map_index(dim, lat, lon, block):
     Inputs:
     Outputs:
     '''
-	x_size = (lon[1] - lon[0]) / dim[0]
-	y_size = (lat[1] - lat[0]) / dim[1]
-	_j = int((float(block[2]) - lon[0]) / x_size) 
-	_i = int((float(block[1]) - lat[0]) / y_size) 
-	j = (dim[0]-1) - _j
-	i = (dim[1]-1) - _i
-	return i, j
+    x_size = (lon[1] - lon[0]) / dim[0]
+    y_size = (lat[1] - lat[0]) / dim[1]
+    _j = int((float(block[2]) - lon[0]) / x_size) 
+    _i = int((float(block[1]) - lat[0]) / y_size) 
+    j = (dim[0]-1) - _j
+    i = (dim[1]-1) - _i
+    return i, j
 
 def build_grid(filename, number):
     '''
