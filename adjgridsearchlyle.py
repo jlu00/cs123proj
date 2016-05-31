@@ -13,7 +13,6 @@ s3 = boto3.resource('s3')
 class MRStates(MRJob):
     def mapper(self, _, line):
         line = line.split(',')
-        print(line[0])
         redistrict(str(line[0]), int(line[1]))
 
 def redistrict(filename, number):
