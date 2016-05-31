@@ -22,3 +22,30 @@ pictures of our redistricted (or partially redistricted) states.
 
 statecsv directory:
 All the state CSV files after it has been parsed by parse_data.py as described above. 
+
+Alternative methods directory: 
+
+linear_search.py: This file implements the most basic method of our algorithm. The alogorithm runs as follows:
+1) remove centroids from the input data
+2) identifies the district with smallest population
+3) calculates the distance between the centroid of smallest population
+   and every block in data (which is numpy array of blocks)
+4) identify the nearest block from the centroid 
+5) the district absorbs the nearest block, recalculates the population
+6) repeat 2~5 until every block has been assigned
+
+linear_search_multiprocessing.py: This file implements python multiprocessing library to linear_search.py.
+Initially, we used a function called pool.map that automatically divides up the data and processors behind the scene. But using this method, it interestingly slowed down the entire process. So instead, after consulting with Professor Wachs, we divided up the data
+into N chunks manually, and did the same with processors as well, and feeded sub_data into each processors. This resulted in expediting linear_search by approximately N times faster.
+
+linear_search_pool.py:
+This file is almost identical to linear_search_multiprocessing.py, but uses pool.map method instead of manually splitting up the data. It turned out that this method slows down the algorithm rathr than expediting.
+
+grid_search_multiprocessing.py:
+This file is almost identical to grid_search.py, but it implements multiprocessing method that we tested in linear_search_multiprocessing.py.
+However, interestingly, this method turned out to be slower than regular gird_search.py even though multiprocessing method did expedite linear_search.py significantly.
+We speculate that the reason is since grid_search.py is already significnatly optimized and only loops through a small subset of the entire data (numpy array of blocks), there might not be enough blocks to merit from launching several processors and dividing up the data into chunks. (i.e. dividing up the data and launching several processors might be more expensive)
+
+
+
+
