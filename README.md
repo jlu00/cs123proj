@@ -4,7 +4,7 @@ Alyssa Blackburn, Lyle Kim and Jessica Lu
 Files: 
 
 Main directory:
-    elasticgridsearch.py: Our main function and contains the District class and map reduce command. Runs on an EC2 instance or with EMR and saves to s3 buckets using boto3. Given a state's CSV file with all its blocks, redistricts according to population and graphs to a png file, which it then saves to an s3 bucket.
+    elastic_grid_search.py: Our main function and contains the District class and map reduce command. Runs on an EC2 instance or with EMR and saves to s3 buckets using boto3. Given a state's CSV file with all its blocks, redistricts according to population and graphs to a png file, which it then saves to an s3 bucket.
  
     parse_data.py: Takes a state's 00001 uf1 and geo uf1 file and parses for the relevant data: all the census blocks in the state, with a unique ID, latitude, longitude and population. Simply extract these two files from the data directory and run with the state's abbreviation (e.g. "il" for Illinois) and your parsed csv will be saved in the main directory. Our finished parsed csvs are located in the directory "statescsv." (The data directory has since been deleted as uploading it would just basically be a big data dump).
 
@@ -28,6 +28,12 @@ All the state CSV files after it has been parsed by parse_data.py as described a
 
 Alternative methods directory: 
 
+    district_class.py:
+    Contains the district class used in grid search
+
+    grid.py:
+    Builds the grid used in grid search
+
     linear_search.py: This file implements the most basic method of our algorithm. The alogorithm runs as follows:
     1) remove centroids from the input data
     2) identifies the district with smallest population
@@ -48,6 +54,13 @@ Alternative methods directory:
     This file is almost identical to grid_search.py, but it implements multiprocessing method that we tested in linear_search_multiprocessing.py.
     However, interestingly, this method turned out to be slower than regular gird_search.py even though multiprocessing method did expedite linear_search.py significantly.
     We speculate that the reason is since grid_search.py is already significnatly optimized and only loops through a small subset of the entire data (numpy array of blocks), there might not be enough blocks to merit from launching several processors and dividing up the data into chunks. (i.e. dividing up the data and launching several processors might be more expensive)
+
+    adj_district_class.py:
+    A revised version of district_class.py where districts have a neighborhood attribute which stores the distances
+    between census blocks in a neighborhood and the centroid of a district in a sorted numpy array.
+
+    adj_grid_search.py:
+    An implementation of grid search using adj_district_class. 
 
 
 
