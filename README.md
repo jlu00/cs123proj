@@ -11,6 +11,8 @@ Main directory:
     state.csv:
     to be fed into the mapper: each line has the name of the CSV where the block information is held, along with the number of distircts for that state.
 
+    elastic_adj_grid_search.py: Similar to elastic_grid_search.py, but with precomputed district neighborhood attributes for faster nearest neighbor search.
+
 Data directory (now deleted):
 All the 00001 uf1 and geo uf1 zip files from the AWS public dataset. 
 
