@@ -8,10 +8,20 @@ import sys
 from functools import partial
 from multiprocessing import Pool, Process, Queue
 
-EPSILON = 500
+'''
+This file implements python multiprocessing library to linear_search.py.
+Initially, we used a function called pool.map that automatically divides
+up the data and processors behind the scene. But using this method, 
+it interestingly slowed down the entire process.
 
-data = np.genfromtxt('statecsv/IL.csv', delimiter=',', skip_header=True)
-#data = np.genfromtxt('ILsubset.csv', delimiter=',', skip_header=True)
+So instead, after consulting with Professor Wachs, we divided up the data
+into N chunks manually, and did the same with processors as well, and feeded
+sub_data into each processors. This resulted in expediting linear_search by
+approximately N times faster.
+'''
+
+EPSILON = 500
+data = np.genfromtxt('IL.csv', delimiter=',', skip_header=True)
 
 centroid_l = [[5,+39.810985,-090.925895,6],
 [60505,+41.781883,-087.684522,111],
@@ -34,60 +44,92 @@ centroid_l = [[5,+39.810985,-090.925895,6],
 [365115,+40.629956,-089.275667,12]]
 
 '''
-centroid_l = [[1,+39.825048,-090.952683,27],
-[275,+40.045300,-091.083620,11],
-[499,+40.013597,-090.960674,16]]
+Inputs: list of centroids (ex: centroid_l above), 
+        data = numpy array of blocks where each block is a list of 
+               unique block number, lattitude, longidute, population
+Outputs: same data (numpy array of blocks) but without centroids 
+
+This function deletes the centroids
+from the data so that find_nearest_block function does not return 
+one of the centroids itself
 '''
-# after creating districts, I should delete the centroids from the data
-# otherwise the least distance block will be centroid itself
 def rm_centroids_from_data(centroids, data):
     for centroid in centroids:
         idx = np.where(data[:,0] == centroid[0])
         data = np.delete(data, idx, 0)
     return data
 
+'''
+Inputs: a block (list), a centroid (list)
+Outputs: typical Euclidean norm
+
+This function calculates the typical Euclidean norm. 
+Initially we used explicit squaring (**)
+but Nick suggested that explicit repeated multiplication is slightly faster
+than using ** to sqaure.
+'''
 def euclidean_norm(block, centroid):
     t1 = (centroid[1] - block[1])
     t2 = (centroid[2] - block[2])
     distance = math.sqrt(t1*t1 + t2*t2)
-    return distance
-    #block[0] = num; block[1] = lat; block[2] = lon; block[3] = pop
+    return [distance, block[0], block[1], block[2], block[3]]
+    #reference: block[0] = num; block[1] = lat; block[2] = lon; block[3] = pop
 
+'''
+Inputs: data(list of blocks), a centroid, a queue
+Outputs: puts the block that's nearest from the input centroid
+
+This function calculates euclidean norm of data(numpy array of every block)
+and a centroid. 
+The closest block and it's information consisting of the unique ID number of the block,
+lattitude, longidute, and population is put into a queue for multiprocessing
+'''
 def find_nearest_block(data, centroid, q):
     distance_list = []
     for i in range(data.shape[0]):
         distance = euclidean_norm(centroid, data[i][:])
         distance_list.append((distance, data[i][0], data[i][1], data[i][2], data[i][3]))
         #data[i][0] = num; data[i][1] = lat; data[i][2] = lon; data[i][3] = pop
-    #return min(distance_list)
     q.put(min(distance_list))
 
+'''
+Input: data (numpy array of blocks), chunksize (integer)
+Output: Numpy array of splitted data into 'chunksize' chunks
+
+This function manually splits up the data into 'chunksize' chunks
+and each will be the input to one of the processors
+'''
 def split_data(data, chunksize):
     return np.array_split(data, chunksize)
 
-def assign_blocks(centroids, data):
+'''
+Inputs: list of centroids
+        numpy array of blocks
+        number of prcesses (integer)
+Outputs: Calls graph function which plots every block
+
+This function assigns each block to one of the centroids.
+It's almost identical to using pool.map in linear_search_pool.py,
+but since pool.map turned out to slow down the algorithm,
+after consulting with Professor Wachs, we manually splitted up
+the data into chunks and input each split chunk to each processor
+which turned out to be approximately 'processes' times faster 
+'''
+def assign_blocks(centroids, data, processes):
     Districts = dc.create_districts(centroids)
     data = rm_centroids_from_data(centroids, data)
 
     q = Queue()
 
-    #pool = Pool(processes = None)
-    processes = 5
-
-
     colors_dict = get_colors(Districts)
-    
-    # stopping conditon with EPSILON
+   
+    # used for stopping conditon with EPSILON
     unassigned_blocks = data.shape[0]
 
     while data.shape[0] != 0:
-
         data_splitted = split_data(data, processes)
-
         priority_district = dc.return_low_pop(Districts)
 
-        #norm_one_arg = partial(euclidean_norm, centroid=priority_district.centroid)
-        #distance_list = pool.imap(norm_one_arg, data, chunksize=10000)
         for subdata in data_splitted:
             p = Process(target=find_nearest_block, args=(subdata, priority_district.centroid, q))
             p.Daemon = True
@@ -96,29 +138,22 @@ def assign_blocks(centroids, data):
         for subdata in data_splitted:
             p.join()
 
-        #nearest_block = min(distance_list) #[1:]
         blocks = []
         while(not q.empty()):
             blocks.append(q.get())
+        # [1:] part gets rid of the distance 
         nearest_block = list(min(blocks)[1:])
-
-        #print("nearest block: ", nearest_block)
 
         plt.scatter(nearest_block[2], nearest_block[1], color=colors_dict[priority_district.id])
 
         priority_district.add_block(nearest_block, Districts) #should i get rid of distance before 
         idx = np.where(data[:,0] == nearest_block[0])
-        #print("idx: ", idx)
         data = np.delete(data, idx, 0)
 
-        print("length of data: ",data.shape[0])
         if (unassigned_blocks - EPSILON) == data.shape[0]:
            break
 
     graph(Districts, data)
-
-    #pool.close()
-    #pool.join()
 
 def get_colors(Districts):
     colors_dict = {}
@@ -136,7 +171,7 @@ def graph(Districts, data):
         yy.append(c[1])
 
     plt.scatter(xx, yy, color='w')#, marker='o')
-    plt.savefig(str(EPSILON)+"lyle.png")
+    plt.savefig(str(EPSILON)+".png")
     plt.show()
 
 
