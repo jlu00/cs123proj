@@ -116,7 +116,7 @@ def get_colors(Districts):
 def graph(districts, centroid_l, statename):
     '''
     Inputs: list of district classes, the list of centroids, the name of the state.
-    Outputs: Saves a png of the graphed result into the s3Bucket. 
+    Outputs: Saves a png of the graphed result into the s3Bucket.  
     '''
     xx = []
     yy = []
@@ -136,6 +136,9 @@ def get_data_from_s3(filename):
     Input: filename
     Output: Data in a numpy array of shape (number of censusblocks, 4)
     Where the 4 fields are unique id, latitude, longitude and population
+
+    We used the boto3 library in order for every node to access 
+    the s3 where all the data is stored.
     '''
     info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=filename).get()
     chunk = info["Body"].read()
@@ -188,7 +191,9 @@ def find_random_centroids(filename, number):
     Outputs: a list of centroids, which are described by
     unique id, latitude, longitude and population. 
 
-    Choice of centroids is random. 
+    Choice of centroids is random as long as there aren't
+    two centroids in the same grid cell.
+    This makes sure that the centroids are reasonably far from each other. 
     '''
     random.seed(0)
     hash_list = []
