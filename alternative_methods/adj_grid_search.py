@@ -1,4 +1,4 @@
-import district_class as dc
+import adj_district_class as dc
 import numpy as np
 import math
 from grid import build_grid, hash_map_index, grid_is_valid, find_random_centroids
@@ -68,7 +68,7 @@ def searching_all(filename, number):
 
 		Grid[int(add_block[5])][int(add_block[6])].remove(add_block[1:-2])
 
-		plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id])
+		plt.scatter(add_block[3], add_block[2], color=colors_dict[priority_district.id], s=1)
 		unassigned_blocks -= 1
 
 	graph(Districts)
