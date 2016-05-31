@@ -120,7 +120,7 @@ def get_data_from_s3(filename):
     We used the boto3 library in order for every node to access 
     the s3 where all the data is stored.
     '''
-    info = s3.Object(bucket_name='jlu.spring16.adjgrid', key=filename).get()
+    info = s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=filename).get()
     chunk = info["Body"].read()
     chunk_string = chunk.decode("utf-8")
     data = chunk_string.split()
@@ -232,7 +232,7 @@ def graph(districts, centroid_l, statename):
     plt.savefig(statename+".png")
     plt.clf()
     imagepath = statename + ".png"
-    s3.Object(bucket_name='jlu.spring16.adjgrid', key=pic_file).put(Body=open(imagepath, 'rb'))
+    s3.Object(bucket_name='jun9242.spr16.cs123.uchicago.edu', key=pic_file).put(Body=open(imagepath, 'rb'))
 
 
 class District:
