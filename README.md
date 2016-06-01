@@ -19,6 +19,9 @@ All the 00001 uf1 and geo uf1 zip files from the AWS public dataset.
 actual_districts directory: 
 Contains pictures of the of what the actual 2000 census districts looked like from the shapefiles. 
 
+adj_results directory:
+Colorado and Nevada pngs finished with adjusted grid search.
+
 results directory:
 Contains png files of our results when we use EMR and run 10,000 blocks per state as well as the full result of Rhode Island and Hawaii, which fully ran. We were unable to have the states run in completion--even after 12 hours of the instance running it shuts down.
 
